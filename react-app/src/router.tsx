@@ -2,7 +2,9 @@ import { createBrowserRouter } from 'react-router-dom'
 import App from './app'
 import ErrorPage from './Pages/error-page'
 import HomePage from './Pages/home-page'
+import MonitorPage from './Pages/monitor-page'
 import NotFoundPage from './Pages/not-found-page'
+import WorkflowsPage from './Pages/workflows-page'
 
 export default createBrowserRouter([
   {
@@ -15,12 +17,12 @@ export default createBrowserRouter([
         element: <HomePage />
       },
       {
-        path: '/create',
-        element: <div>Create page</div>
+        path: '/workflows',
+        element: <WorkflowsPage />
       },
       {
-        path: '/view',
-        element: <div>View page</div>
+        path: '/monitor',
+        element: <MonitorPage />
       }
     ]
   },
