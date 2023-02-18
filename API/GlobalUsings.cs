@@ -1,0 +1,14 @@
+global using HotChocolate.AspNetCore; 
+global using HotChocolate.Types; 
+global using API.Constants;
+global using Microsoft.EntityFrameworkCore;
+global using API.EF.Entities;
+global using API.EF;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using API.Interfaces;
+global using API.Services;
+global using API.Repositories;
+global using API.Enums;
+global using API.Models;
+global using API.Extensions;
+global using API.Queries;
