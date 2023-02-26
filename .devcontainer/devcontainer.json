@@ -33,8 +33,15 @@
       "extensions": ["ms-dotnettools.csharp", "ms-mssql.mssql"]
     }
   },
-  "forwardPorts": [1433, 3000, 5299],
-
+  "forwardPorts": [1433, 3000, 5299, 7206, 5173],
+  "portsAttributes": {
+    "7206": {
+      "protocol": "https"
+    },
+    "5173": {
+      "protocol": "https"
+    }
+  },
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [5000, 5001],
   // "portsAttributes": {

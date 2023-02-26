@@ -1,16 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>5ece9ddc-e24c-424c-a972-ba76737a06c6</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.26.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.2" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">

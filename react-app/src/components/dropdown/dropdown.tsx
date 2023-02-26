@@ -1,5 +1,4 @@
 import classNames from 'classnames'
-import { ReactNode, useState } from 'react'
 
 export default function Dropdown({
   className,
@@ -8,10 +7,10 @@ export default function Dropdown({
   children,
   onBackdropClick
 }: {
-  button: ReactNode
+  button: JSX.Element
   isOpen: boolean
   className?: string
-  children?: ReactNode[]
+  children?: JSX.Element[]
   onBackdropClick?: () => void
 }) {
   const items = children ? children : <div className="whitespace-nowrap px-4 py-2">No items to display</div>

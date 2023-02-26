@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom'
 import { HomeIcon, Cog8ToothIcon, EyeIcon } from '@heroicons/react/24/outline'
-import { ReactNode } from 'react'
 
 function NavLinkWrapper({
   linkText,
@@ -10,7 +9,7 @@ function NavLinkWrapper({
 }: {
   linkText: string
   path: string
-  icon: ReactNode
+  icon: JSX.Element
   showSideNav: boolean
 }) {
   const className = showSideNav ? 'w-8 pr-2' : 'w-8 pr-0'
@@ -28,6 +27,7 @@ function NavLinkWrapper({
 
 export default function NavLinks({ showSideNav }: { showSideNav: boolean }) {
   const className = showSideNav ? 'py-2 px-4' : 'py-2 px-1'
+
   return (
     <nav>
       <ul>

@@ -30,7 +30,7 @@ const query = gql`
 
 export function useInitialLoad() {
   const fetchInitial = async () => {
-    return await request(import.meta.env.VITE_API_ENDPOINT, query)
+    return await request(import.meta.env.VITE_API_ENDPOINT + 'graphql', query)
   }
 
   return useQuery<WaitActivityMetadata, Error>('metadata', fetchInitial)

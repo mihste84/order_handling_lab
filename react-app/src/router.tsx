@@ -1,10 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom'
 import App from './app'
-import ErrorPage from './Pages/error-page'
-import HomePage from './Pages/home-page'
-import MonitorPage from './Pages/monitor-page'
-import NotFoundPage from './Pages/not-found-page'
-import WorkflowsPage from './Pages/workflows-page'
+import ProtectedRoute from './components/common/protected-route'
+import ErrorPage from './pages/error-page'
+import ForbiddenErrorPage from './pages/forbidden-error-page'
+import HomePage from './pages/home-page'
+import MonitorPage from './pages/monitor-page'
+import NotFoundPage from './pages/not-found-page'
+import WorkflowsPage from './pages/workflows-page'
 
 export default createBrowserRouter([
   {
@@ -18,16 +20,38 @@ export default createBrowserRouter([
       },
       {
         path: '/workflows',
-        element: <WorkflowsPage />
+        element: <ProtectedRoute children={<WorkflowsPage />} />
       },
       {
         path: '/monitor',
-        element: <MonitorPage />
+        element: <ProtectedRoute children={<MonitorPage />} />
+      },
+      {
+        path: '/login',
+        element: <LoginPage />
+      },
+      {
+        path: '/logout',
+        element: <ProtectedRoute children={<LogoutPage />} />
       }
     ]
+  },
+  {
+    path: '/forbidden',
+    element: <ForbiddenErrorPage />
   },
   {
     path: '*',
     element: <NotFoundPage />
   }
 ])
+
+function LoginPage() {
+  window.location.href = import.meta.env.VITE_API_ENDPOINT + 'auth/login'
+  return null
+}
+
+function LogoutPage() {
+  window.location.href = import.meta.env.VITE_API_ENDPOINT + 'auth/logout'
+  return null
+}
