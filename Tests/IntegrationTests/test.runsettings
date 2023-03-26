@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <TestRunParameters>
+    <Parameter name="DB_CONNECTION_STRING" value="Server=localhost; Database=OrderHandlingTestDb; User Id=sa;Password=P@ssw0rd;TrustServerCertificate=true" />
+  </TestRunParameters>
+</RunSettings>
+<!-- dotnet test IntegrationTests.csproj -s .runsettings -->

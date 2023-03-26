@@ -4,14 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[ApiController, Route("[controller]/[action]")]
-public class AuthController : Controller
+[ApiController, Route("api/[controller]/[action]")]
+public class AuthController : ControllerBase
 {
-    private IConfiguration _config;
+    private readonly IConfiguration _config;
+    private readonly AppLogic.Common.Interfaces.IAuthenticationService _authenticationService;
 
-    public AuthController(IConfiguration config)
+    public AuthController(IConfiguration config, AppLogic.Common.Interfaces.IAuthenticationService authenticationService)
     {
         _config = config;
+        _authenticationService = authenticationService;
     }
 
     public IActionResult Login(string returnUrl = "/")
@@ -25,8 +27,5 @@ public class AuthController : Controller
         return new SignOutResult("OpenIdConnect", new AuthenticationProperties { RedirectUri = _config["AzureAd:RedirectUri"] });
     }
 
-    public AppUser GetAppUser() => new() { 
-        IsAuthenticated = HttpContext?.User?.Identity?.IsAuthenticated ?? false,
-        UserName = HttpContext?.User?.Identity?.Name ?? "Not logged in"
-    };
+    public AppUser GetAppUser() => _authenticationService.GetAppUser();
 }

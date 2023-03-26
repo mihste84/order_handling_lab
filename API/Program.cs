@@ -1,13 +1,14 @@
+using Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
-builder.Services.AddPooledDbContextFactory<AppDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext"))
-);
+builder.Services.AddDatabaseServices(builder.Configuration.GetConnectionString("AppDbContext"));
+builder.Services.AddCommonServices();
+builder.Services.AddCustomerServices();
+builder.Services.AddAuthenticationServices();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -18,30 +19,22 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services
     .RegisterAllServices()
-    .AddCors()
-    .AddHttpContextAccessor()
-    .AddGraphQLServer()
-    .RegisterDbContext<AppDbContext>(DbContextKind.Pooled)
-    .AddQueryType<Query>()
-    .AddFiltering()
-    .AddSorting();
+    .AddCors();
 
 var app = builder.Build();
 
-
 app.UseHttpsRedirection();
-if(app.Environment.IsDevelopment()) 
-    app.UseCors(_ => _.AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true).AllowCredentials());
 
+if(app.Environment.IsDevelopment()) {
+    app.UseCors(_ => _.AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true).AllowCredentials());
+    app.UseHttpLogging();
+} else {
+    app.UseHsts();
+}
+    
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-app.MapGraphQL().WithOptions(serverOptions: new GraphQLServerOptions {
-    Tool = {
-        Enable = app.Environment.IsDevelopment()
-    }
-});
 
 app.Run();

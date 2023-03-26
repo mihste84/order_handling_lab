@@ -4,19 +4,22 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>5ece9ddc-e24c-424c-a972-ba76737a06c6</UserSecretsId>
+
+    <UserSecretsId>2c1c079a-738f-474f-b97b-036b0ad52866</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Identity.Web" Version="1.26.0" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.2" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AppLogic\Customers\Customers.csproj" />
+    <ProjectReference Include="..\Services\DatabaseDapper\DatabaseDapper.csproj" />
+    <ProjectReference Include="..\Services\Authentication\Authentication.csproj" />
 
+  </ItemGroup>
 </Project>
