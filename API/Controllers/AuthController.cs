@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace API.Controllers;
 
@@ -16,15 +15,15 @@ public class AuthController : ControllerBase
         _authenticationService = authenticationService;
     }
 
-    public IActionResult Login(string returnUrl = "/")
+    public IActionResult Login([FromQuery]string returnUrl = "/")
     {
-        return new ChallengeResult("OpenIdConnect", new AuthenticationProperties() { RedirectUri = _config["AzureAd:RedirectUri"] });
+        return new ChallengeResult("OpenIdConnect", new AuthenticationProperties() { RedirectUri = returnUrl });
     }
 
     [Authorize]
-    public async Task<IActionResult> Logout() {
+    public async Task<IActionResult> Logout([FromQuery]string returnUrl = "/") {
         await HttpContext.SignOutAsync();
-        return new SignOutResult("OpenIdConnect", new AuthenticationProperties { RedirectUri = _config["AzureAd:RedirectUri"] });
+        return new SignOutResult("OpenIdConnect", new AuthenticationProperties { RedirectUri = returnUrl });
     }
 
     public AppUser GetAppUser() => _authenticationService.GetAppUser();

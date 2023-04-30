@@ -5,7 +5,8 @@ CREATE TABLE [dbo].[Cities](
 	[CreatedBy] [nvarchar](200) NOT NULL,
 	[Created] [datetime2](7) NOT NULL,
 	[UpdatedBy] [nvarchar](200) NOT NULL,
-	[Updated] [datetime2](7) NOT NULL
+	[Updated] [datetime2](7) NOT NULL,
+	[RowVersion] [rowversion] NOT NULL
 )
 GO
 

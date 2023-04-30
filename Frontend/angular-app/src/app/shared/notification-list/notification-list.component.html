@@ -1,0 +1,14 @@
+<div *ngIf="notifications.length; else emptyList">
+  <section *ngFor="let item of notifications" class="w-96">
+    <div class="mb-2">
+      <app-notification-card
+        [notification]="item"
+        (remove)="removeNotificationCallback($event)"
+      ></app-notification-card>
+    </div>
+  </section>
+</div>
+
+<ng-template #emptyList>
+  <p>No notifications to display</p>
+</ng-template>

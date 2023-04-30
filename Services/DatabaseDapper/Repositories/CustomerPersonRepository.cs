@@ -13,29 +13,29 @@ public class CustomerPersonRepository : ICustomerPersonRepository
         _transaction = transaction;
     }
 
-    public async Task<CustomerPerson?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<CustomerPerson?> GetByIdAsync(int id)
     {
         var sql = "SELECT * FROM CustomerPersons WHERE Id = @Id";
         return await _transaction.Connection.QueryFirstOrDefaultAsync<CustomerPerson>(sql, new { Id = id }, transaction: _transaction);
     }
 
-    public async Task<int?> InsertAsync(CustomerPerson entity, CancellationToken cancellationToken)
+    public async Task<int?> InsertAsync(CustomerPerson entity)
     {
         var sql = """
-            INSERT INTO CustomerPersons (FirstName, MiddleName, LastName, Ssn, CustomerId, CreatedBy, UpdatedBy, Created, Updated) 
+            INSERT INTO CustomerPersons (FirstName, MiddleName, LastName, Ssn, CustomerId, CreatedBy, UpdatedBy) 
             OUTPUT INSERTED.[Id] 
-            VALUES (@FirstName, @MiddleName, @LastName, @Ssn, @CustomerId, @CreatedBy, @UpdatedBy, @Created, @Updated);
+            VALUES (@FirstName, @MiddleName, @LastName, @Ssn, @CustomerId, @CreatedBy, @UpdatedBy);
         """;
         return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, transaction: _transaction);
     }
 
-    public async Task<bool> DeleteByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteByIdAsync(int id)
     {
         var sql = "DELETE FROM CustomerPersons WHERE Id = @Id";
         return (await _transaction.Connection.ExecuteAsync(sql, new { Id = id }, transaction: _transaction))> 0;
     }
 
-    public async Task<bool> UpdateAsync(CustomerPerson entity, CancellationToken cancellationToken)
+    public async Task<bool> UpdateAsync(CustomerPerson entity)
     {
         var sql = """
             UPDATE CustomerPersons 

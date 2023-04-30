@@ -16,8 +16,10 @@ public class AuthenticationService : IAuthenticationService
 
     public AppUser GetAppUser() => new(
         IsAuthenticated: IsAuthenticated(),
-        UserName: _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "Not logged in"
+        UserName: GetUserName()
     );
 
     public bool IsAuthenticated() => _httpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+
+    public string GetUserName() => _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "Not logged in";
 }

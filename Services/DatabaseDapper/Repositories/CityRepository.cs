@@ -13,35 +13,35 @@ public class CityRepository : ICityRepository
         _transaction = transaction;
     }
 
-    public async Task<City?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<City?> GetByIdAsync(int id )
     {
         var sql = "SELECT * FROM Cities WHERE Id = @Id";
         return await _transaction.Connection.QueryFirstOrDefaultAsync<City>(sql, new { Id = id }, transaction: _transaction);
     }
 
-    public async Task<City?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<City?> GetByNameAsync(string name )
     {
         var sql = "SELECT * FROM Cities WHERE Name = @Id";
         return await _transaction.Connection.QueryFirstOrDefaultAsync<City>(sql, new { Name = name }, transaction: _transaction);
     }
 
-    public async Task<int?> InsertAsync(City entity, CancellationToken cancellationToken = default)
+    public async Task<int?> InsertAsync(City entity )
     {
         var sql = """
-            INSERT INTO Cities (Name, CountryId, CreatedBy, UpdatedBy, Created, Updated) 
+            INSERT INTO Cities (Name, CountryId, CreatedBy, UpdatedBy) 
             OUTPUT INSERTED.[Id] 
-            VALUES (@Name, @CountryId, @CreatedBy, @UpdatedBy, @Created, @Updated);
+            VALUES (@Name, @CountryId, @CreatedBy, @UpdatedBy);
         """;
         return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, transaction: _transaction);
     }
 
-    public async Task<bool> DeleteByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteByIdAsync(int id )
     {
         var sql = "DELETE FROM Cities WHERE Id = @Id";
         return (await _transaction.Connection.ExecuteAsync(sql, new { Id = id }, transaction: _transaction))> 0;
     }
 
-    public async Task<bool> UpdateAsync(City entity, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateAsync(City entity )
     {
         var sql = """
             UPDATE Cities 

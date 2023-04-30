@@ -8,7 +8,8 @@ CREATE TABLE [dbo].[CustomerPersons](
 	[CreatedBy] [nvarchar](200) NOT NULL,
 	[Created] [datetime2](7) NOT NULL,
 	[UpdatedBy] [nvarchar](200) NOT NULL,
-	[Updated] [datetime2](7) NOT NULL
+	[Updated] [datetime2](7) NOT NULL,
+	[RowVersion] [rowversion] NOT NULL
 )
 GO
 ALTER TABLE [dbo].[CustomerPersons] ADD CONSTRAINT DF_CustomerPersons_Created DEFAULT GETUTCDATE() FOR [Created];

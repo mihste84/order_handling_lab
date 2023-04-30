@@ -7,5 +7,7 @@ public interface IUnitOfWork
     ICustomerRepository CustomerRepository { get; }
     ICustomerCompanyRepository CustomerCompanyRepository { get; }
     ICustomerPersonRepository CustomerPersonRepository { get; }
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    ICustomerContactInfoRepository CustomerContactInfoRepository { get; }
+    ICustomerAddressesRepository CustomerAddressesRepository { get; }
+    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

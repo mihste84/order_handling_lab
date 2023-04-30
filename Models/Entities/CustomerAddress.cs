@@ -3,7 +3,7 @@ namespace Models.Entities;
 public class CustomerAddress : BaseEntity
 {
     public string? Address { get; set; }
-    public bool Primary { get; set; }
+    public bool? IsPrimary { get; set; }
     public string? PostArea { get; set; }
     public string? ZipCode { get; set; }
     

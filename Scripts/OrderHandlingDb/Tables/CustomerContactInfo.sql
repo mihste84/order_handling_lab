@@ -6,7 +6,8 @@ CREATE TABLE [dbo].[CustomerContactInfo](
     [CreatedBy] [nvarchar](200) NOT NULL,
     [Created] [datetime2](7) NOT NULL,
     [UpdatedBy] [nvarchar](200) NOT NULL,
-    [Updated] [datetime2](7) NOT NULL
+    [Updated] [datetime2](7) NOT NULL,
+    [RowVersion] [rowversion] NOT NULL
 )
 GO
 ALTER TABLE [dbo].[CustomerContactInfo] ADD CONSTRAINT DF_CustomerContactInfo_Created DEFAULT GETUTCDATE() FOR [Created];
@@ -35,6 +36,7 @@ CREATE NONCLUSTERED INDEX [IX_CustomerContactInfo_CustomerId_ContactType] ON [db
 GO
 ALTER TABLE [dbo].[CustomerContactInfo] ADD CONSTRAINT [FK_CustomerContactInfo_Customers_CustomerId] FOREIGN KEY([CustomerId])
 REFERENCES [dbo].[Customers] ([Id])
+ON DELETE CASCADE
 GO
 
 ALTER TABLE [dbo].[CustomerContactInfo] CHECK CONSTRAINT [FK_CustomerContactInfo_Customers_CustomerId]

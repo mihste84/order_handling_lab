@@ -2,6 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": ".NET Core Launch (console)",
+      "type": "coreclr",
+      "request": "launch",
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "program": "${workspaceFolder}/ConsoleLab/bin/Debug/net7.0/ConsoleLab.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/ConsoleLab",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "preLaunchTask": "cbuild"
+    },
+    {
       // Use IntelliSense to find out which attributes exist for C# debugging
       // Use hover for the description of the existing attributes
       // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md

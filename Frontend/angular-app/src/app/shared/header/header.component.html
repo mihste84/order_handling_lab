@@ -1,0 +1,27 @@
+<header class="flex h-full items-center justify-start px-4 text-white">
+  <h1 class="text-xl">{{ title }}</h1>
+  <section class="flex-auto"></section>
+  <section class="relative cursor-pointer text-black"></section>
+  <ng-container *ngIf="user?.isAuthenticated; then loggedIn; else loggedOut"></ng-container>
+</header>
+
+<ng-template #loggedOut>
+  <a class="ml-2 relative cursor-pointer text-black" routerLink="/login">Login</a>
+</ng-template>
+
+<ng-template #loggedIn>
+  <span
+    [popper]="errorList"
+    [popperPreventOverflow]="true"
+    popperApplyClass="bg-white"
+    [popperPlacement]="popperBottom"
+    class="relative cursor-pointer text-black"
+  >
+    Errors
+  </span>
+  <a class="ml-2 relative cursor-pointer text-black" routerLink="/logout">Logout</a>
+</ng-template>
+
+<popper-content #errorList>
+  <app-notification-list></app-notification-list>
+</popper-content>

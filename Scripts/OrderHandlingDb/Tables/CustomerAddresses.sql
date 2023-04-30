@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[CustomerAddresses](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Address] [nvarchar](200) NOT NULL,
-	[Primary] [bit] NOT NULL,
+	[IsPrimary] [bit] NOT NULL,
 	[PostArea] [nvarchar](50) NOT NULL,
 	[ZipCode] [nvarchar](10) NOT NULL,
 	[CountryId] [int] NULL,
@@ -10,7 +10,8 @@ CREATE TABLE [dbo].[CustomerAddresses](
 	[CreatedBy] [nvarchar](200) NOT NULL,
 	[Created] [datetime2](7) NOT NULL,
 	[UpdatedBy] [nvarchar](200) NOT NULL,
-	[Updated] [datetime2](7) NOT NULL
+	[Updated] [datetime2](7) NOT NULL,
+	[RowVersion] [rowversion] NOT NULL
 )
 GO
 

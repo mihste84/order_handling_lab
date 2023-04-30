@@ -7,7 +7,6 @@ public static class Startup
     {
         services.AddScoped<IDateTimeService, DateTimeService>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthenticationBehaviour<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehaviour<,>));
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        // services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehaviour<,>));
     }
 }

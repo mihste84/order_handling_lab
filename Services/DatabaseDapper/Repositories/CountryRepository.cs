@@ -13,35 +13,35 @@ public class CountryRepository : ICountryRepository
         _transaction = transaction;
     }
 
-    public async Task<Country?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Country?> GetByIdAsync(int id )
     {
         var sql = "SELECT * FROM Countries WHERE Id = @Id";
         return await _transaction.Connection.QueryFirstOrDefaultAsync<Country>(sql, new { Id = id }, transaction: _transaction);
     }
 
-    public async Task<Country?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<Country?> GetByNameAsync(string name )
     {
         var sql = "SELECT * FROM Countries WHERE Name = @Id";
         return await _transaction.Connection.QueryFirstOrDefaultAsync<Country>(sql, new { Name = name }, transaction: _transaction);
     }
 
-    public async Task<int?> InsertAsync(Country entity, CancellationToken cancellationToken = default)
+    public async Task<int?> InsertAsync(Country entity )
     {
         var sql = """
-            INSERT INTO Countries (Name, Abbreviation, PhonePrefix, CreatedBy, UpdatedBy, Created, Updated) 
+            INSERT INTO Countries (Name, Abbreviation, PhonePrefix, CreatedBy, UpdatedBy) 
             OUTPUT INSERTED.[Id] 
-            VALUES (@Name, @Abbreviation, @PhonePrefix, @CreatedBy, @UpdatedBy, @Created, @Updated);
+            VALUES (@Name, @Abbreviation, @PhonePrefix, @CreatedBy, @UpdatedBy);
         """;
         return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, transaction: _transaction);
     }
 
-    public async Task<bool> DeleteByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteByIdAsync(int id )
     {
         var sql = "DELETE FROM Countries WHERE Id = @Id";
         return (await _transaction.Connection.ExecuteAsync(sql, new { Id = id }, transaction: _transaction))> 0;
     }
 
-    public async Task<bool> UpdateAsync(Country entity, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateAsync(Country entity )
     {
         var sql = """
             UPDATE Countries 

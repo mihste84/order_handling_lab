@@ -9,5 +9,6 @@ public class CustomerAddressModelValidator : AbstractValidator<CustomerAddressMo
         RuleFor(x => x.ZipCode).NotEmpty().MaximumLength(10);
         RuleFor(x => x.CountryId).NotEmpty();
         RuleFor(x => x.CityId).NotEmpty();
+        RuleFor(x => x.IsPrimary).NotEmpty();
     }
 }

@@ -1,4 +1,4 @@
-using AppLogic.Common.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Services.DatabaseDapper;
 
@@ -6,6 +6,7 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
 {
     private IDbConnection? _connection;
     private IDbTransaction? _transaction;
+    private ILogger<DapperUnitOfWork>? _logger;
 
     private ICountryRepository? _countryRepository;
     public ICountryRepository CountryRepository => _countryRepository ?? (_countryRepository = new CountryRepository(_transaction));
@@ -22,11 +23,17 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
     private ICustomerPersonRepository? _customerPersonRepository;
     public ICustomerPersonRepository CustomerPersonRepository => _customerPersonRepository ?? (_customerPersonRepository = new CustomerPersonRepository(_transaction));
 
-    public DapperUnitOfWork(IDbConnection connection)
+    private ICustomerContactInfoRepository? _customerContactInfoRepository;
+    public ICustomerContactInfoRepository CustomerContactInfoRepository => _customerContactInfoRepository ?? (_customerContactInfoRepository = new CustomerContactInfoRepository(_transaction));
+
+    private ICustomerAddressesRepository? _customerAddressesRepository;
+    public ICustomerAddressesRepository CustomerAddressesRepository => _customerAddressesRepository ?? (_customerAddressesRepository = new CustomerAddressesRepository(_transaction));
+    public DapperUnitOfWork(IDbConnection connection, ILogger<DapperUnitOfWork>? logger)
     {
         _connection = connection;
         _connection.Open();
         _transaction = _connection.BeginTransaction();
+        _logger = logger;
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -35,8 +42,15 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
         {
             _transaction?.Commit(); 
         } 
-        catch 
+        catch(SqlException ex)
         { 
+            LogAllSqlExceptions(ex);
+            _transaction?.Rollback(); 
+            throw; 
+        } 
+        catch(Exception ex)
+        { 
+            _logger?.LogError(ex, "An unknown error occurred while saving changes");
             _transaction?.Rollback(); 
             throw; 
         } 
@@ -58,6 +72,13 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
         _connection = null;
     }
 
+    private void LogAllSqlExceptions(Exception ex) 
+    {
+        _logger?.LogError(ex, "A database error occurred while saving changes.");
+        if (ex.InnerException != null)
+            LogAllSqlExceptions(ex.InnerException);
+    }
+
     private void ResetRepositories()
     {
         _countryRepository = null;
@@ -65,5 +86,6 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
         _customerRepository = null;
         _customerCompanyRepository = null;
         _customerPersonRepository = null;
+        _customerContactInfoRepository = null;
     }
 }

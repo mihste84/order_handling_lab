@@ -11,4 +11,9 @@ public static class Startup
         services.AddHttpContextAccessor();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
     }
+
+    public static void AddTestAuthenticationServices(this IServiceCollection services)
+    {
+        services.AddScoped<IAuthenticationService, TestAuthenticationService>();
+    }
 }
