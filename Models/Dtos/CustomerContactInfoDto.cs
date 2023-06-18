@@ -5,9 +5,6 @@ public record CustomerContactInfoDto(
     int? CustomerId,
     string? Type,
     string? Value,
-    string? CreatedBy,
-    string? UpdatedBy,
-    DateTime Created,
-    DateTime Updated,
+    string? Prefix,
     byte[]? RowVersion
 );

@@ -11,7 +11,7 @@ public record CustomerAddressDto(
     int? CityId,
     string? CreatedBy,
     string? UpdatedBy,
-    DateTime Created,
-    DateTime Updated,
+    DateTime? Created,
+    DateTime? Updated,
     byte[]? RowVersion
 );

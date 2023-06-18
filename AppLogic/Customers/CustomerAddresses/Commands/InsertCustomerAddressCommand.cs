@@ -1,6 +1,6 @@
 namespace AppLogic.Customers.CustomerAddresses.Commands;
 
-public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf<Success<int>, Error<string>, ValidationError>>
+public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf<Success<SqlResult>, Error<string>, ValidationError>>
 {
     public int? CustomerId { get; set; }
 
@@ -13,17 +13,15 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
         }
     }
     
-    public class InsertCustomerAddressHandler : IRequestHandler<InsertCustomerAddressCommand, OneOf<Success<int>, Error<string>, ValidationError>>
+    public class InsertCustomerAddressHandler : IRequestHandler<InsertCustomerAddressCommand, OneOf<Success<SqlResult>, Error<string>, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public readonly IAuthenticationService _authenticationService;
         private readonly IValidator<InsertCustomerAddressCommand> _validator;
 
-        private readonly CustomerMapper _mapper = new CustomerMapper();
-
         public InsertCustomerAddressHandler(
-            IUnitOfWork unitOfWork, 
-            IAuthenticationService authenticationService, 
+            IUnitOfWork unitOfWork,
+            IAuthenticationService authenticationService,
             IValidator<InsertCustomerAddressCommand> validator)
         {
             _unitOfWork = unitOfWork;
@@ -31,7 +29,7 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             _validator = validator;
         }
 
-        public async Task<OneOf<Success<int>, Error<string>, ValidationError>> Handle(InsertCustomerAddressCommand request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<SqlResult>, Error<string>, ValidationError>> Handle(InsertCustomerAddressCommand request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request);
             if (!result.IsValid)
@@ -39,19 +37,34 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
                 
             var username = _authenticationService.GetUserName();
 
-            var address = _mapper.MapModelToCustomerAddressWithParams(request, request.CustomerId, username);
-            address.CustomerId = request.CustomerId;
+            var address = MapModelToCustomerAddress(request, username);
             
             if (request.IsPrimary == true)
                 await _unitOfWork.CustomerAddressesRepository.RemoveAllPrimaryAsync(request.CustomerId);
             
-            var id = await _unitOfWork.CustomerAddressesRepository.InsertAsync(address);
-            if (id == null)
+            var res = await _unitOfWork.CustomerAddressesRepository.InsertAsync(address);
+            if (res == null)
                 return new Error<string>("Failed to insert customer address.");
 
             await _unitOfWork.SaveChangesAsync();
 
-            return new Success<int>(id.Value);
+            return new Success<SqlResult>(res);
         }
+
+        private CustomerAddress MapModelToCustomerAddress(InsertCustomerAddressCommand model, string username)
+        => new()
+        {
+            Id = model.Id,
+            CustomerId = model.CustomerId,
+            IsPrimary = model.IsPrimary,
+            Address = model.Address,
+            PostArea = model.PostArea,
+            ZipCode = model.ZipCode,
+            CountryId = model.CountryId,
+            CityId = model.CityId,
+            CreatedBy = username,
+            UpdatedBy = username,
+            RowVersion = model.RowVersion
+        };        
     }
 }

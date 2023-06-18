@@ -1,6 +1,6 @@
 namespace AppLogic.Customers.CustomerAddresses.Commands;
 
-public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf<Success, Error<string>, NotFound, ValidationError>>
+public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf<Success<SqlResult>, Error<string>, NotFound, ValidationError>>
 {
     public int? CustomerId { get; set; }
 
@@ -15,7 +15,7 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
         }
     }
     
-    public class UpdateCustomerAddressHandler : IRequestHandler<UpdateCustomerAddressCommand, OneOf<Success, Error<string>, NotFound, ValidationError>>
+    public class UpdateCustomerAddressHandler : IRequestHandler<UpdateCustomerAddressCommand, OneOf<Success<SqlResult>, Error<string>, NotFound, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public readonly IAuthenticationService _authenticationService;
@@ -34,7 +34,7 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             _dateTimeService = dateTimeService;
         }
 
-        public async Task<OneOf<Success, Error<string>, NotFound, ValidationError>> Handle(UpdateCustomerAddressCommand request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<SqlResult>, Error<string>, NotFound, ValidationError>> Handle(UpdateCustomerAddressCommand request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request);
             if (!result.IsValid)
@@ -60,13 +60,13 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             if (request.IsPrimary == true)
                 await _unitOfWork.CustomerAddressesRepository.RemoveAllPrimaryAsync(request.CustomerId!.Value);
             
-            var success = await _unitOfWork.CustomerAddressesRepository.UpdateAsync(address);
-            if (!success)
+            var res = await _unitOfWork.CustomerAddressesRepository.UpdateAsync(address);
+            if (res == null)
                 return new Error<string>("Failed to update customer address.");
 
             await _unitOfWork.SaveChangesAsync();
 
-            return new Success();
+            return new Success<SqlResult>(res);
         }
     }
 }

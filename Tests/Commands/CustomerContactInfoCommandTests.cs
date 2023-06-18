@@ -11,7 +11,7 @@ public class CustomerContactInfoCommandTests
         var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
                
         var command = new InsertCustomerContactInfoCommand {
-            Value = "123456568",
+            Value = "+46704512343",
             Type = ContactInfoType.Phone,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
             CustomerId = 1
@@ -35,7 +35,7 @@ public class CustomerContactInfoCommandTests
         var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
                
         var command = new InsertCustomerContactInfoCommand {
-            Value = "123456568",
+            Value = "+46704512343",
             Type = ContactInfoType.Phone,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
             CustomerId = 1
@@ -70,7 +70,7 @@ public class CustomerContactInfoCommandTests
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT2);
         var errors = result.AsT2.Errors;
-        Assert.Equal(2, errors.Count());
+        Assert.Equal(3, errors.Count());
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.Never);
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>()), Times.Never);
@@ -80,10 +80,10 @@ public class CustomerContactInfoCommandTests
     public async Task InsertCustomerContactInfoCommand_No_Insert_Fail() 
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() );
-        mockUnitOfWork.Setup(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>())).ReturnsAsync((int?)null);
+        mockUnitOfWork.Setup(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>())).ReturnsAsync((SqlResult?)null);
 
         var command = new InsertCustomerContactInfoCommand {           
-            Value = "123456568",
+            Value = "+46704512343",
             Type = ContactInfoType.Phone,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
             CustomerId = 1
@@ -107,7 +107,7 @@ public class CustomerContactInfoCommandTests
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
 
         var command = new UpdateCustomerContactInfoCommand {           
-            Value = "123456568",
+            Value = "+46704512343",
             Type = ContactInfoType.Phone,
             Id = 1,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
@@ -144,7 +144,7 @@ public class CustomerContactInfoCommandTests
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT3);
         var errors = result.AsT3.Errors;
-        Assert.Equal(3, errors.Count());
+        Assert.Equal(4, errors.Count());
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.Never);
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>()), Times.Never);
@@ -157,7 +157,7 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.Setup(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((CustomerContactInfo?)null);
 
         var command = new UpdateCustomerContactInfoCommand {           
-            Value = "123456568",
+            Value = "+46704512343",
             Type = ContactInfoType.Phone,
             Id = 1,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
@@ -182,7 +182,7 @@ public class CustomerContactInfoCommandTests
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
 
         var command = new UpdateCustomerContactInfoCommand {           
-            Value = "123456568",
+            Value = "+46704512343",
             Type = ContactInfoType.Phone,
             Id = 1,
             RowVersion = new byte[] { 11, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
@@ -271,17 +271,17 @@ public class CustomerContactInfoCommandTests
 
     private Mock<IUnitOfWork> GetMockUnitOfWork(RepoitoryReturnValues returnValues) {
         var mockUnitOfWork = new Mock<IUnitOfWork>();
-        
+        var res = new SqlResult { Id = returnValues.CustomerContactInfoId };
         var mockCustomerContactInfoRepository = new Mock<ICustomerContactInfoRepository>();
         mockCustomerContactInfoRepository
             .Setup(x => x.InsertAsync(It.IsAny<CustomerContactInfo>()))
-            .ReturnsAsync(returnValues.CustomerContactInfoId);
+            .ReturnsAsync(res);
         mockCustomerContactInfoRepository
             .Setup(x => x.DeleteByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(returnValues.Delete);
         mockCustomerContactInfoRepository
             .Setup(x => x.UpdateAsync(It.IsAny<CustomerContactInfo>()))
-            .ReturnsAsync(returnValues.Update);
+            .ReturnsAsync(res);
         mockCustomerContactInfoRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(new CustomerContactInfo() { 

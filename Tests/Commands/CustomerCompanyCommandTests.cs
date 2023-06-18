@@ -55,7 +55,8 @@ public class CustomerCompanyCommandTests
     public async Task InsertCustomerCompanyCommand_No_Insert_Fail() 
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() );
-        mockUnitOfWork.Setup(x => x.CustomerCompanyRepository.InsertAsync(It.IsAny<CustomerCompany>())).ReturnsAsync((int?)null);
+        mockUnitOfWork.Setup(x => x.CustomerCompanyRepository.InsertAsync(It.IsAny<CustomerCompany>())).ReturnsAsync((SqlResult
+        ?)null);
 
         var command = new InsertCustomerCompanyCommand {           
             Name = "Test Company",
@@ -83,7 +84,7 @@ public class CustomerCompanyCommandTests
         var command = new UpdateCustomerCompanyCommand {           
             Name = "Test Company",
             Code = "TC",
-            CustomerCompanyId = 1,
+            Id = 1,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
         };
         var handler = new UpdateCustomerCompanyCommand.UpdateCustomerCompanyHandler(
@@ -133,7 +134,7 @@ public class CustomerCompanyCommandTests
         var command = new UpdateCustomerCompanyCommand {   
             Name = "Test Company",
             Code = "TC",
-            CustomerCompanyId = 1,        
+            Id = 1,        
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
         };
         var handler = new UpdateCustomerCompanyCommand.UpdateCustomerCompanyHandler(
@@ -158,7 +159,7 @@ public class CustomerCompanyCommandTests
         var command = new UpdateCustomerCompanyCommand {   
             Name = "Test Company",
             Code = "TC",
-            CustomerCompanyId = 1,        
+            Id = 1,        
             RowVersion = new byte[] { 11, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
         };
         var handler = new UpdateCustomerCompanyCommand.UpdateCustomerCompanyHandler(
@@ -248,15 +249,16 @@ public class CustomerCompanyCommandTests
         var mockUnitOfWork = new Mock<IUnitOfWork>();
         
         var mockCustomerCompanyRepository = new Mock<ICustomerCompanyRepository>();
+        var res = new SqlResult { Id = returnValues.CustomerCompanyId };
         mockCustomerCompanyRepository
             .Setup(x => x.InsertAsync(It.IsAny<CustomerCompany>()))
-            .ReturnsAsync(returnValues.CustomerCompanyId);
+            .ReturnsAsync(res);
         mockCustomerCompanyRepository
             .Setup(x => x.DeleteByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(returnValues.DeleCustomer);
         mockCustomerCompanyRepository
             .Setup(x => x.UpdateAsync(It.IsAny<CustomerCompany>()))
-            .ReturnsAsync(returnValues.UpdateCustomer);
+            .ReturnsAsync(res);
         mockCustomerCompanyRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(new CustomerCompany() { 

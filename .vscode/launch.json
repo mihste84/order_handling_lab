@@ -2,31 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": ".NET Core Launch (console)",
-      "type": "coreclr",
-      "request": "launch",
-      "env": {
-        "DOTNET_ENVIRONMENT": "Development"
-      },
-      "program": "${workspaceFolder}/ConsoleLab/bin/Debug/net7.0/ConsoleLab.dll",
-      "args": [],
-      "cwd": "${workspaceFolder}/ConsoleLab",
-      "console": "internalConsole",
-      "stopAtEntry": false,
-      "preLaunchTask": "cbuild"
-    },
-    {
       // Use IntelliSense to find out which attributes exist for C# debugging
       // Use hover for the description of the existing attributes
       // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-      "name": ".NET Core Launch (web)",
+      "name": ".NET Core Launch (app)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/API/bin/Debug/net7.0/API.dll",
+      "program": "${workspaceFolder}/App/bin/Debug/net7.0/App.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/API",
+      "cwd": "${workspaceFolder}/App",
       "stopAtEntry": false,
       // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
       // "serverReadyAction": {
@@ -34,7 +20,9 @@
       //   "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
       // },
       "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy",
+        "ASPNETCORE_HTTPS_PORT": "7250"
       }
       // "sourceFileMap": {
       //   "/Views": "${workspaceFolder}/Views"

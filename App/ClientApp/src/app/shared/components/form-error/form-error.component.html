@@ -1,0 +1,21 @@
+<div class="text-red-500" *ngIf="control?.invalid && control?.errors?.['required']">
+  <ng-content select="[required]" />
+</div>
+<div class="text-red-500" *ngIf="control?.invalid && control?.errors?.['maxlength']">
+  <ng-content select="[maxlength]" />
+</div>
+<div class="text-red-500" *ngIf="control?.invalid && control?.errors?.['minlength']">
+  <ng-content select="[minlength]" />
+</div>
+<div class="text-red-500" *ngIf="control?.invalid && control?.errors?.['pattern']">
+  <ng-content select="[pattern]" />
+</div>
+<div class="text-red-500" *ngIf="control?.invalid && control?.errors?.['invalidPhone']">
+  <ng-content select="[invalidPhone]" />
+</div>
+<div class="text-red-500" *ngIf="control?.invalid && control?.errors?.['invalidEmail']">
+  <ng-content select="[invalidEmail]" />
+</div>
+<div class="text-red-500" *ngIf="control?.invalid && control?.errors?.['invalidUrl']">
+  <ng-content select="[invalidUrl]" />
+</div>

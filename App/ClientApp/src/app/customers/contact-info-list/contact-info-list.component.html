@@ -1,0 +1,28 @@
+<fieldset class="border p-4">
+  <legend class="px-2">Contact Info</legend>
+  <article *ngFor="let item of contactInfo" class="flex items-center justify-between mb-2">
+    <p>
+      {{ item.type }}
+    </p>
+    <p *ngIf="item.type === 'Phone' || item.type === 'Fax'">{{ item.prefix }}-{{ item.value }}</p>
+    <p *ngIf="item.type === 'E-mail' || item.type === 'Website'">
+      {{ item.value }}
+    </p>
+    <div>
+      <button
+        class="bg-blue-600 rounded-md px-1 hover:opacity-70 text-white me-1"
+        (click)="onEditContactInfo.emit(item)"
+      >
+        <fa-icon [icon]="faPencil" />
+      </button>
+      <button class="bg-red-600 rounded-md px-1 hover:opacity-70 text-white" (click)="onDeleteContactInfo.emit(item)">
+        <fa-icon [icon]="faTrash" />
+      </button>
+    </div>
+  </article>
+  <div class="text-right" *ngIf="contactInfo.length < 5">
+    <button class="text-sm text-blue-500 whitespace-nowrap cursor-pointer" (click)="onAddContactInfo.emit()">
+      Add Contact Info
+    </button>
+  </div>
+</fieldset>

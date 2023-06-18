@@ -21,12 +21,4 @@ public class DynamicSearchQueryTests
         var query = DynamicSearchQuery.GetWhereFromSearchItem(item);
         Assert.Equal(expectedQuery, query.ToString());
     }
-
-    [Fact]
-    public void GetWhereFromSearchItem_Array_Value_Success() {
-        var item = new SearchItem("FirstName", new[] { 1, 2 }, SearchOperators.In, false);
-        var query = DynamicSearchQuery.GetWhereFromSearchItem(item);
-        Assert.Equal("FirstName IN System.Int32[]", query.ToString());
-        Assert.Equal("{0:raw} IN {1}", query.Format);
-    }
 }

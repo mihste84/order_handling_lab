@@ -1,0 +1,57 @@
+<article class="flex flex-row flex-wrap">
+  <select
+    [(ngModel)]="selectedSearchItem"
+    (ngModelChange)="selectItemModelChange()"
+    class="rounded-md mb-1 me-1 h-8 text-sm py-1 max-w-xs"
+  >
+    <option value=""></option>
+    <option *ngFor="let option of getNotSelectedSearchItem()" [ngValue]="option">{{ option.distplayName }}</option>
+  </select>
+  <ng-container *ngIf="selectedSearchItem">
+    <section>
+      <select
+        *ngIf="!selectedSearchItem.isValueSelectable"
+        class="rounded-md mb-1 me-1 h-8 text-sm py-1 max-w-xs"
+        [(ngModel)]="selectedSearchItem.operator"
+        (ngModelChange)="operatorChange()"
+      >
+        <option *ngFor="let option of getOperatorsByType(selectedSearchItem)" [ngValue]="option.value">
+          {{ option.name }}
+        </option>
+      </select>
+      <input
+        *ngIf="selectedSearchItem.operator && !isNullOperatorSelected() && !selectedSearchItem.isValueSelectable"
+        class="rounded-md mb-1 me-1 h-8 text-sm py-1 max-w-xs"
+        [type]="selectedSearchItem.type"
+        [(ngModel)]="selectedSearchItem.value"
+      />
+      <select
+        *ngIf="selectedSearchItem.operator && !isNullOperatorSelected() && selectedSearchItem.isValueSelectable"
+        class="rounded-md mb-1 me-1 h-8 text-sm py-1 max-w-xs"
+        [(ngModel)]="selectedSearchItem.value"
+      >
+        <option *ngFor="let option of selectedSearchItem.listValues" [ngValue]="option.value">
+          {{ option.displayName }}
+        </option>
+      </select>
+    </section>
+  </ng-container>
+  <button
+    [disabled]="!isSelectable()"
+    (click)="selectItem()"
+    class="h-8 rounded-md px-2 text-sm py-1 bg-blue-500 text-white disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap mb-1"
+  >
+    Add filter <fa-icon [icon]="faPlus" />
+  </button>
+</article>
+<article class="flex flex-row flex-wrap">
+  <output
+    class="rounded-lg bg-gray-500 text-white p-1 px-2 me-2 whitespace-nowrap mb-1"
+    *ngFor="let item of getSelectedSearchItem()"
+  >
+    <span class="text-xs">
+      <b>{{ item.distplayName }}</b> {{ getOperatorDisplayName(item) }} <b>{{ getValue(item) }}</b>
+    </span>
+    <button type="button" class="ml-2" (click)="removeSearchItem(item)"><fa-icon [icon]="faXmark" /></button>
+  </output>
+</article>

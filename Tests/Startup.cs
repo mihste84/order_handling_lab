@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using AppLogic.Common;
 using AppLogic.Customers;
-using Authentication;
 
 namespace Tests;
 
@@ -11,6 +10,6 @@ public class Startup
     {
         services.AddCommonServices();
         services.AddCustomerServices();
-        services.AddTestAuthenticationServices();
+        services.AddScoped<IAuthenticationService, TestAuthenticationService>();
     }
 }

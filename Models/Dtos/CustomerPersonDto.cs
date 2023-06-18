@@ -13,7 +13,9 @@ public record CustomerPersonDto
     public IEnumerable<CustomerContactInfoDto>? CustomerContactInfos { get; set; }
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
-    public DateTime Created { get; set; }
-    public DateTime Updated { get; set; }
+    public DateTime? Created { get; set; }
+    public DateTime? Updated { get; set; }
     public byte[]? RowVersion { get; set; }
+    public byte[]? CustomerRowVersion { get; set; }
+
 }

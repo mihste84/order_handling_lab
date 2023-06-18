@@ -1,6 +1,6 @@
 namespace AppLogic.Customers.BaseCustomers.Commands;
 
-public class UpdateCustomerCommand : IRequest<OneOf<Success, NotFound, Error<string>, ValidationError>>
+public class UpdateCustomerCommand : IRequest<OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>>
 {
     public int? Id { get; set; }
     public bool? IsActive { get; set; }
@@ -17,7 +17,7 @@ public class UpdateCustomerCommand : IRequest<OneOf<Success, NotFound, Error<str
         }
     }
 
-    public class UpdateCustomerHandler : IRequestHandler<UpdateCustomerCommand, OneOf<Success, NotFound, Error<string>, ValidationError>>
+    public class UpdateCustomerHandler : IRequestHandler<UpdateCustomerCommand, OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<UpdateCustomerCommand> _validator;
@@ -34,7 +34,7 @@ public class UpdateCustomerCommand : IRequest<OneOf<Success, NotFound, Error<str
             _authenticationService = authenticationService;
             _dateTimeService = dateTimeService;
         }
-        public async Task<OneOf<Success, NotFound, Error<string>, ValidationError>> Handle(
+        public async Task<OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>> Handle(
             UpdateCustomerCommand request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request);
@@ -52,13 +52,13 @@ public class UpdateCustomerCommand : IRequest<OneOf<Success, NotFound, Error<str
             customer.UpdatedBy = _authenticationService.GetUserName();
             customer.Updated = _dateTimeService.GetUtc();
 
-            var succeess = await _unitOfWork.CustomerRepository.UpdateAsync(customer);
-            if (!succeess)
+            var res = await _unitOfWork.CustomerRepository.UpdateAsync(customer);
+            if (res == null)
                 return new Error<string>("Failed to update customer");
                 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new Success();
+            return new Success<SqlResult>(res);
         }
     }
 }

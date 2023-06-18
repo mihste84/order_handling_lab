@@ -1,3 +1,5 @@
+using Models.Constants;
+
 namespace AppLogic.Customers.BaseCustomers.Queries;
 
 public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>, Success<CustomerCompanyDto>, Error<string>, NotFound, ValidationError>>
@@ -49,12 +51,11 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>
             if (customer == null)
                 return new NotFound();
 
-            var mapper = new CustomerMapper();
             if (customer.CustomerPerson != null && customer.CustomerCompany == null) 
-                return new Success<CustomerPersonDto>(mapper.MapCustomerPersonToCustomerDto(customer));
+                return new Success<CustomerPersonDto>(MapToCustomerPersonDto(customer));
 
             if (customer.CustomerPerson == null && customer.CustomerCompany != null)
-                return new Success<CustomerCompanyDto>(mapper.MapCustomerCompanyToCustomerDto(customer));
+                return new Success<CustomerCompanyDto>(MapToCustomerCompanyDto(customer));
 
             return new Error<string>("Customer cannot be both a person and a company.");
         }
@@ -67,5 +68,79 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>
             "id" => await _unitOfWork.CustomerRepository.GetByIdAsync(int.Parse(value)),
             _ => throw new ArgumentException("Invalid customer type", nameof(type))
         };
+
+        private CustomerCompanyDto MapToCustomerCompanyDto(Customer model) 
+        => new() {
+            Active = model.Active,
+            Code = model.CustomerCompany!.Code,
+            Id = model.CustomerCompany.Id,
+            Name = model.CustomerCompany!.Name,
+            CreatedBy = model.CreatedBy,
+            Created = model.Created,
+            Updated = model.Updated,
+            UpdatedBy = model.UpdatedBy,
+            CustomerId = model.Id,
+            CustomerAddresses = model.CustomerAddresses?.Select(_ => MapToCustomerAddressDto(_)),
+            RowVersion = model.CustomerCompany.RowVersion,
+            CustomerRowVersion = model.RowVersion,
+            CustomerContactInfos = model.CustomerContactInfos?.Select(_ => MapToCustomerContactInfoDto(_)),
+        };      
+
+        private CustomerPersonDto MapToCustomerPersonDto(Customer model) 
+        => new() {
+            Active = model.Active,
+            FirstName = model.CustomerPerson!.FirstName,
+            Id = model.CustomerPerson.Id,
+            LastName = model.CustomerPerson.LastName,
+            MiddleName = model.CustomerPerson.MiddleName,
+            Ssn = model.CustomerPerson.Ssn,
+            CreatedBy = model.CreatedBy,
+            Created = model.Created,
+            Updated = model.Updated,
+            UpdatedBy = model.UpdatedBy,
+            CustomerId = model.Id,
+            CustomerAddresses = model.CustomerAddresses?.Select(_ => MapToCustomerAddressDto(_)),
+            RowVersion = model.CustomerPerson.RowVersion,
+            CustomerRowVersion = model.RowVersion,
+            CustomerContactInfos = model.CustomerContactInfos?.Select(_ => MapToCustomerContactInfoDto(_)),
+        };
+
+        private CustomerAddressDto MapToCustomerAddressDto(CustomerAddress model)
+        => new(
+            model.Id,
+            model.CustomerId,
+            model.IsPrimary,
+            model.Address,
+            model.PostArea,
+            model.ZipCode,
+            model.CountryId,
+            model.CityId,
+            model.CreatedBy,
+            model.UpdatedBy,
+            model.Created,
+            model.Updated,
+            model.RowVersion
+        );   
+
+        private CustomerContactInfoDto MapToCustomerContactInfoDto(CustomerContactInfo model) {
+            var (value, prefix) = GetValueAndPrefix(model.Value, model.Type);
+            return new(
+                model.Id,
+                model.CustomerId,
+                model.Type,
+                value,
+                prefix,
+                model.RowVersion
+            );
+        }
+
+        private (string? Value, string? Prefix) GetValueAndPrefix(string? value, string? type) {
+            if (type == ContactInfoType.Email || type == ContactInfoType.Website)
+                return (value, null);
+
+            var prefix = value?.Substring(0, 3);
+            var number = value?.Substring(3);
+            return (number, prefix);
+        }
     }
 }

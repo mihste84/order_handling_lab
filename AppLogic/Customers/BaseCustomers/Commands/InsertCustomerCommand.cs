@@ -1,6 +1,8 @@
+using Models.Exceptions;
+
 namespace AppLogic.Customers.BaseCustomers.Commands;
 
-public class InsertCustomerCommand : IRequest<OneOf<Success<int?>, Error<string>, ValidationError>>
+public class InsertCustomerCommand : IRequest<OneOf<Success<SqlResult>, Error<string>, ValidationError>>
 {
     public bool IsCompany { get; init; }
     public string? Code { get; init; }
@@ -23,7 +25,7 @@ public class InsertCustomerCommand : IRequest<OneOf<Success<int?>, Error<string>
             }).Otherwise(() => {
                 RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50).WithName("First Name");
                 RuleFor(x => x.LastName).NotEmpty().MaximumLength(50).WithName("Last Name");
-                RuleFor(x => x.Ssn).NotEmpty().MinimumLength(10).MaximumLength(20).WithName("SSN");
+                RuleFor(x => x.Ssn).NotEmpty().Matches(@"^\d{8}-[a-zA-Z0-9]{4,5}$").WithName("SSN");
                 RuleFor(x => x.MiddleName).MaximumLength(50).WithName("Middle Name");
             });
 
@@ -35,12 +37,11 @@ public class InsertCustomerCommand : IRequest<OneOf<Success<int?>, Error<string>
         }
     }
 
-    public class InsertCustomerHandler : IRequestHandler<InsertCustomerCommand, OneOf<Success<int?>, Error<string>, ValidationError>>
+    public class InsertCustomerHandler : IRequestHandler<InsertCustomerCommand, OneOf<Success<SqlResult>, Error<string>, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<InsertCustomerCommand> _validator;
         private readonly IAuthenticationService _authenticationService;
-        private readonly CustomerMapper _mapper = new();
         public InsertCustomerHandler(
             IUnitOfWork unitOfWork, 
             IValidator<InsertCustomerCommand> validator, 
@@ -51,7 +52,7 @@ public class InsertCustomerCommand : IRequest<OneOf<Success<int?>, Error<string>
             _authenticationService = authenticationService;
         }
 
-        public async Task<OneOf<Success<int?>, Error<string>, ValidationError>> Handle(
+        public async Task<OneOf<Success<SqlResult>, Error<string>, ValidationError>> Handle(
             InsertCustomerCommand request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request);
@@ -65,33 +66,80 @@ public class InsertCustomerCommand : IRequest<OneOf<Success<int?>, Error<string>
                 CreatedBy = username,
                 UpdatedBy = username
             };
-            var customerId = await _unitOfWork.CustomerRepository.InsertAsync(customer);
-            if (!customerId.HasValue) 
+            var customerRes = await _unitOfWork.CustomerRepository.InsertAsync(customer);
+            if (customerRes == null) 
                 return new Error<string>("Failed to create new customer.");
 
-            var addresses = request.CustomerAddresses!.Select(_ => _mapper.MapModelToCustomerAddressWithParams(_, customerId, username));
+            var addresses = request.CustomerAddresses!.Select(_ => MapModelToCustomerAddress(_, customerRes.Id, username));
             if (!await _unitOfWork.CustomerAddressesRepository.InsertMultipleAsync(addresses))
                 return new Error<string>("Failed to create new customer addresses.");
             
-            var contactInfo = request.ContactInfo!.Select(_ => _mapper.MapModelToCustomerContactInfoWithParams(_, customerId, username));                     
+            var contactInfo = request.ContactInfo!.Select(_ => MapModelToCustomerContactInfo(_, customerRes.Id, username));                     
             if (!await _unitOfWork.CustomerContactInfoRepository.InsertMultipleAsync(contactInfo))
                 return new Error<string>("Failed to create new customer contact info.");
 
-            var id = await InsertCustomerAsync(request, customerId, username);
-            if (!id.HasValue) 
-                return new Error<string>("Failed to create new customer company");
+            try {
+                var res = await InsertCustomerAsync(request, customerRes.Id, username);
+                if (res == null) 
+                    return new Error<string>("Failed to create new customer company");
 
-            await _unitOfWork.SaveChangesAsync(CancellationToken.None);
-            return new Success<int?>(customerId);
+                await _unitOfWork.SaveChangesAsync(CancellationToken.None);
+                return new Success<SqlResult>(customerRes);
+            } catch (UniqueConstraintException ex) {
+                return new Error<string>(ex.Message);
+            }    
         }
 
-        private async Task<int?> InsertCustomerAsync(InsertCustomerCommand request, int? customerId, string? username) {
+        private async Task<SqlResult?> InsertCustomerAsync(InsertCustomerCommand request, int? customerId, string? username) {
             if (request.IsCompany) {
-                var customerCompany = _mapper.MapCommandToCustomerCompanyWithParams(request, customerId, username);
+                var customerCompany = MapModelToCustomerCompany(request, customerId, username);
                 return await _unitOfWork.CustomerCompanyRepository.InsertAsync(customerCompany);
             } 
-            var customerPerson = _mapper.MapCommandToCustomerPersonWithParams(request, customerId, username);
+            var customerPerson = MapModelToCustomerPerson(request, customerId, username);
             return await _unitOfWork.CustomerPersonRepository.InsertAsync(customerPerson);
         }
+
+        private CustomerPerson MapModelToCustomerPerson(InsertCustomerCommand model, int? customerId, string? username) 
+        => new() {
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            MiddleName = model.MiddleName,
+            Ssn = model.Ssn,
+            CreatedBy = username,
+            UpdatedBy = username,
+            CustomerId = customerId
+        };
+
+        private CustomerCompany MapModelToCustomerCompany(InsertCustomerCommand model, int? customerId, string? username) 
+        => new() {
+            Name = model.Name,
+            Code = model.Code,
+            CreatedBy = username,
+            UpdatedBy = username,
+            CustomerId = customerId
+        };
+
+        private CustomerContactInfo MapModelToCustomerContactInfo(CustomerContactInfoModel model, int? customerId, string? username)
+        => new() {
+            Type = model.Type,
+            Value = model.Value,
+            CreatedBy = username,
+            UpdatedBy = username,
+            CustomerId = customerId
+        };
+
+        private CustomerAddress MapModelToCustomerAddress(CustomerAddressModel model, int? customerId, string? username) 
+        => new() {
+            Address = model.Address,
+            CityId = model.CityId,
+            CountryId = model.CountryId,
+            ZipCode = model.ZipCode,
+            CreatedBy = username,
+            UpdatedBy = username,
+            CustomerId = customerId,
+            PostArea = model.PostArea,
+            IsPrimary = model.IsPrimary
+        };
+
     }
 }

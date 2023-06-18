@@ -5,3 +5,4 @@ global using MediatR;
 global using Models.Values;
 global using Models.Entities;
 global using Models.Dtos;
+global using AppLogic.Common.Models;

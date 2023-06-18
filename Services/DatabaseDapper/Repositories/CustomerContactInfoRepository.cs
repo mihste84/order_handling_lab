@@ -30,28 +30,29 @@ public class CustomerContactInfoRepository  : ICustomerContactInfoRepository {
         return await _transaction.Connection.QueryAsync<CustomerContactInfo>(sql, new { CustomerId = customerId }, _transaction);
     }
 
-    public async Task<int?> InsertAsync(CustomerContactInfo entity)
+    public async Task<SqlResult?> InsertAsync(CustomerContactInfo entity)
     {
         var sql = """
             INSERT INTO CustomerContactInfo (Type, Value, CustomerId, CreatedBy, UpdatedBy) 
-            OUTPUT INSERTED.[Id] 
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion
             VALUES (@Type, @Value, @CustomerId, @CreatedBy, @UpdatedBy);
         """;
         
-        return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, _transaction);
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, _transaction);
     }
 
     public async Task<bool> InsertMultipleAsync(IEnumerable<CustomerContactInfo> contactInfo)
     {
         var sql = """
-            INSERT INTO CustomerContactInfo (Type, Value, CustomerId, CreatedBy, UpdatedBy) 
+            INSERT INTO CustomerContactInfo (Type, Value, CustomerId, CreatedBy, UpdatedBy)
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion 
             VALUES (@Type, @Value, @CustomerId, @CreatedBy, @UpdatedBy);
         """;
 
         return await _transaction.Connection.ExecuteAsync(sql, contactInfo, _transaction) > 0;
     }
 
-    public async Task<bool> UpdateAsync(CustomerContactInfo entity )
+    public async Task<SqlResult> UpdateAsync(CustomerContactInfo entity )
     {
         var sql = """
             UPDATE CustomerContactInfo 
@@ -60,8 +61,9 @@ public class CustomerContactInfoRepository  : ICustomerContactInfoRepository {
                 CustomerId = @CustomerId,
                 UpdatedBy = @UpdatedBy,
                 Updated = @Updated
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion 
             WHERE Id = @Id
         """;
-        return await _transaction.Connection.ExecuteAsync(sql, entity, _transaction) > 0;
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, _transaction);
     }
 }

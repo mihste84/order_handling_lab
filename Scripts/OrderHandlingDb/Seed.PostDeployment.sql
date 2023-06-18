@@ -2,10 +2,10 @@ SET IDENTITY_INSERT [dbo].Countries ON;
 
 IF NOT EXISTS (SELECT * FROM [dbo].Countries)
     INSERT INTO [dbo].Countries ([Id], [Abbreviation], [Created], [CreatedBy], [Name], [PhonePrefix], [Updated], [UpdatedBy])
-    VALUES (1, N'SE', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Sweden', NULL, '2023-03-19T20:31:29.6461210Z', N'Seed'),
-    (2, N'FI', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Finland', NULL, '2023-03-19T20:31:29.6461210Z', N'Seed'),
-    (3, N'NO', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Norway', NULL, '2023-03-19T20:31:29.6461210Z', N'Seed'),
-    (4, N'DK', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Denmark', NULL, '2023-03-19T20:31:29.6461210Z', N'Seed');
+    VALUES (1, N'SE', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Sweden', '+46', '2023-03-19T20:31:29.6461210Z', N'Seed'),
+    (2, N'FI', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Finland', '+358', '2023-03-19T20:31:29.6461210Z', N'Seed'),
+    (3, N'NO', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Norway', '+47', '2023-03-19T20:31:29.6461210Z', N'Seed'),
+    (4, N'DK', '2023-03-19T20:31:29.6461210Z', N'Seed', N'Denmark', '+45', '2023-03-19T20:31:29.6461210Z', N'Seed');
 ELSE 
     print 'Countries already seeded';
 

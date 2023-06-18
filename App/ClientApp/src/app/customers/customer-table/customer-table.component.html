@@ -1,0 +1,48 @@
+<table class="table-auto border-spacing-3.5 border-collapse w-full" style="min-width: 1600px">
+  <thead>
+    <tr>
+      <th class="border-slate-300 border-b"></th>
+      <th *ngFor="let item of tableHeaders" class="border-slate-300 border-b text-left">
+        <app-table-header
+          (onSort)="onSort.emit($event)"
+          [currentSortColumnName]="currentSortColumnName"
+          [currentSortDirection]="currentSortDirection"
+          [name]="item.name"
+          [isSortable]="item.isSortable"
+        >
+          <span title>{{ item.title }}</span>
+        </app-table-header>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of customers" class="hover:bg-gray-100">
+      <td>
+        <span [popper]="list" [popperDisableStyle]="true">
+          <fa-icon [icon]="faEllipsisVertical" class="px-2 cursor-pointer hover:opacity-70" />
+        </span>
+        <popper-content #list>
+          <ul class="border border-gray-700 shadow-md rounded-sm bg-white z-50">
+            <li class="bg-blue-500 text-white py-1 px-2 whitespace-nowrap">Customer #{{ item.id }}</li>
+            <li class="py-1 px-2 cursor-pointer hover:bg-slate-300" routerLink="/app/customers/{{ item.id }}">Edit</li>
+            <li class="py-1 px-2 cursor-pointer hover:bg-slate-300" (click)="onRowClick('Delete', item, list)">
+              Delete
+            </li>
+          </ul>
+        </popper-content>
+      </td>
+      <td>{{ item.id }}</td>
+      <td>{{ item.firstName }}</td>
+      <td>{{ item.lastName }}</td>
+      <td>{{ item.middleName }}</td>
+      <td>{{ item.ssn }}</td>
+      <td>{{ item.code }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.active ? "Yes" : "No" }}</td>
+      <td>{{ item.created | date : "yyyy-MM-dd HH:mm:ss" }}</td>
+      <td>{{ item.createdBy }}</td>
+      <td>{{ item.updated | date : "yyyy-MM-dd HH:mm:ss" }}</td>
+      <td>{{ item.updatedBy }}</td>
+    </tr>
+  </tbody>
+</table>

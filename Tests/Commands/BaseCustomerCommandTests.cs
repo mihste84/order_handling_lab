@@ -1,7 +1,6 @@
 using AppLogic.Common.Services;
 using AppLogic.Customers.CommonModels;
 using AppLogic.Customers.BaseCustomers.Commands;
-using Models.Values;
 using AppLogic.Customers.BaseCustomers.Queries;
 
 namespace Tests.Commands;
@@ -13,12 +12,11 @@ public class BaseCustomersCommandTests
     public async Task InsertCustomerCommand_Customer_Person_Pass() 
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
-               
         var command = new InsertCustomerCommand {
             IsCompany = false,
             FirstName = "John",
             LastName = "Doe",
-            Ssn = "1234567890",
+            Ssn = "00000000-0000",
             MiddleName = "M",
             CustomerAddresses = new[] {
                 new CustomerAddressModel {
@@ -37,7 +35,7 @@ public class BaseCustomersCommandTests
                 },
                 new CustomerContactInfoModel {
                     Type = ContactInfoType.Phone,
-                    Value = "1234567890"
+                    Value = "+46701234567"
                 }
             }
         };
@@ -82,7 +80,7 @@ public class BaseCustomersCommandTests
                 },
                 new CustomerContactInfoModel {
                     Type = ContactInfoType.Phone,
-                    Value = "1234567890"
+                    Value = "+46701234567"
                 }
             }
         };
@@ -295,7 +293,7 @@ public class BaseCustomersCommandTests
                 FirstName = "Test",
                 LastName = "Test",
                 MiddleName = "Test",
-                Ssn = "123456789",
+                Ssn = "00000000-0000",
                 CustomerId = 1
             },
             CreatedBy = "Test",
@@ -428,17 +426,17 @@ public class BaseCustomersCommandTests
 
     private Mock<IUnitOfWork> GetMockUnitOfWork(RepoitoryReturnValues returnValues) {
         var mockUnitOfWork = new Mock<IUnitOfWork>();
-        
+        var result = new SqlResult { Id = returnValues.CustomerId };
         var mockCustomerRepository = new Mock<ICustomerRepository>();
         mockCustomerRepository
             .Setup(x => x.InsertAsync(It.IsAny<Customer>()))
-            .ReturnsAsync(returnValues.CustomerId);
+            .ReturnsAsync(result);
         mockCustomerRepository
             .Setup(x => x.DeleteByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(returnValues.DeleCustomer);
         mockCustomerRepository
             .Setup(x => x.UpdateAsync(It.IsAny<Customer>()))
-            .ReturnsAsync(returnValues.UpdateCustomer);
+            .ReturnsAsync(result);
 
         mockCustomerRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<int>()))
@@ -451,12 +449,12 @@ public class BaseCustomersCommandTests
         var mockCustomerPersonRepository = new Mock<ICustomerPersonRepository>();
         mockCustomerPersonRepository
             .Setup(x => x.InsertAsync(It.IsAny<CustomerPerson>()))
-            .ReturnsAsync(returnValues.CustomerPersonId);
+            .ReturnsAsync(new SqlResult { Id = returnValues.CustomerPersonId });
 
         var mockCustomerCompanyRepository = new Mock<ICustomerCompanyRepository>();
         mockCustomerCompanyRepository
             .Setup(x => x.InsertAsync(It.IsAny<CustomerCompany>()))
-            .ReturnsAsync(returnValues.CustomerCompanyId);
+            .ReturnsAsync(new SqlResult { Id = returnValues.CustomerCompanyId });
 
         var mockCustomerContactInfoRepository = new Mock<ICustomerContactInfoRepository>();
         mockCustomerContactInfoRepository.

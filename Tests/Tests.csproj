@@ -25,7 +25,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Services\DatabaseDapper\DatabaseDapper.csproj" />
-    <ProjectReference Include="..\Services\Authentication\Authentication.csproj" />
     <ProjectReference Include="..\AppLogic\Customers\Customers.csproj" />
   </ItemGroup>
 </Project>

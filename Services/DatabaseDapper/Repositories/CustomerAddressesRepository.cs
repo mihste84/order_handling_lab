@@ -30,15 +30,15 @@ public class CustomerAddressesRepository : ICustomerAddressesRepository
         return await _transaction.Connection.QueryAsync<CustomerAddress>(sql, new { CustomerId = customerId }, _transaction);
     }
 
-    public async Task<int?> InsertAsync(CustomerAddress entity )
+    public async Task<SqlResult?> InsertAsync(CustomerAddress entity )
     {
         var sql = """
             INSERT INTO CustomerAddresses (Address, IsPrimary, PostArea, ZipCode, CountryId, CustomerId, CityId, CreatedBy, UpdatedBy)
-            OUTPUT INSERTED.[Id] 
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion
             VALUES (@Address, @IsPrimary, @PostArea, @ZipCode, @CountryId, @CustomerId, @CityId, @CreatedBy, @UpdatedBy);
         """;
 
-        return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, _transaction);
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, _transaction);
     }
 
     public async Task<bool> InsertMultipleAsync(IEnumerable<CustomerAddress> addresses)
@@ -51,7 +51,7 @@ public class CustomerAddressesRepository : ICustomerAddressesRepository
         return await _transaction.Connection.ExecuteAsync(sql, addresses, _transaction) > 0;
     }
 
-    public async Task<bool> UpdateAsync(CustomerAddress entity )
+    public async Task<SqlResult> UpdateAsync(CustomerAddress entity )
     {
         var sql = """
             UPDATE CustomerAddresses 
@@ -63,14 +63,15 @@ public class CustomerAddressesRepository : ICustomerAddressesRepository
                 CountryId = @CountryId,
                 UpdatedBy = @UpdatedBy,
                 Updated = @Updated
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion
             WHERE Id = @Id
         """;
-        return await _transaction.Connection.ExecuteAsync(sql, entity, _transaction) > 0;
+        return await _transaction.Connection.ExecuteScalarAsync<SqlResult>(sql, entity, _transaction);
     }
 
     public async Task RemoveAllPrimaryAsync(int? customerId)
     {
         var sql = "UPDATE CustomerAddresses SET IsPrimary = 0 WHERE CustomerId = @CustomerId";
-        await _transaction.Connection.ExecuteAsync(sql, new { CustomerId = customerId }, _transaction);
+        await _transaction.Connection.QuerySingleAsync(sql, new { CustomerId = customerId }, _transaction);
     }
 }

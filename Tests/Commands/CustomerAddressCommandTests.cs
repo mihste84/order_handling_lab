@@ -91,7 +91,7 @@ public class CustomerAddressCommandTests
     public async Task InsertCustomerAddressCommand_No_Insert_Fail() 
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() );
-        mockUnitOfWork.Setup(x => x.CustomerAddressesRepository.InsertAsync(It.IsAny<CustomerAddress>())).ReturnsAsync((int?)null);
+        mockUnitOfWork.Setup(x => x.CustomerAddressesRepository.InsertAsync(It.IsAny<CustomerAddress>())).ReturnsAsync((SqlResult?)null);
 
         var command = new InsertCustomerAddressCommand {           
             Address = "Test Address",
@@ -342,13 +342,13 @@ public class CustomerAddressCommandTests
         var mockCustomerAddressRepository = new Mock<ICustomerAddressesRepository>();
         mockCustomerAddressRepository
             .Setup(x => x.InsertAsync(It.IsAny<CustomerAddress>()))
-            .ReturnsAsync(returnValues.CustomerAddressId);
+            .ReturnsAsync(new SqlResult { Id = returnValues.CustomerAddressId });
         mockCustomerAddressRepository
             .Setup(x => x.DeleteByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(returnValues.Delete);
         mockCustomerAddressRepository
             .Setup(x => x.UpdateAsync(It.IsAny<CustomerAddress>()))
-            .ReturnsAsync(returnValues.Update);
+            .ReturnsAsync(new SqlResult { Id = returnValues.CustomerAddressId });
         mockCustomerAddressRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(new CustomerAddress() { 

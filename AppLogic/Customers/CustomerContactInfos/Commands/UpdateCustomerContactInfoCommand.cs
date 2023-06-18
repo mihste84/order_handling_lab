@@ -1,6 +1,6 @@
 namespace AppLogic.Customers.CustomerContactInfos.Commands;
 
-public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IRequest<OneOf<Success, NotFound, Error<string>, ValidationError>>
+public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IRequest<OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>>
 { 
     public class UpdateCustomerContactInfoValidator : AbstractValidator<UpdateCustomerContactInfoCommand>
     {
@@ -12,7 +12,7 @@ public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IReque
         }
     }
 
-    public class UpdateCustomerContactInfoHandler : IRequestHandler<UpdateCustomerContactInfoCommand, OneOf<Success, NotFound, Error<string>, ValidationError>>
+    public class UpdateCustomerContactInfoHandler : IRequestHandler<UpdateCustomerContactInfoCommand, OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public readonly IAuthenticationService _authenticationService;
@@ -31,7 +31,7 @@ public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IReque
             _dateTimeService = dateTimeService;
         }
 
-        public async Task<OneOf<Success, NotFound, Error<string>, ValidationError>> Handle(UpdateCustomerContactInfoCommand request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>> Handle(UpdateCustomerContactInfoCommand request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request);
             if (!result.IsValid)
@@ -50,13 +50,13 @@ public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IReque
             info.UpdatedBy = username;
             info.Updated = _dateTimeService.GetUtc();
 
-            var success = await _unitOfWork.CustomerContactInfoRepository.UpdateAsync(info);
-            if (!success)
+            var res = await _unitOfWork.CustomerContactInfoRepository.UpdateAsync(info);
+            if (res == null)
                 return new Error<string>("Failed to update customer info.");
 
             await _unitOfWork.SaveChangesAsync();
 
-            return new Success();
+            return new Success<SqlResult>(res);
         }
     }
 }

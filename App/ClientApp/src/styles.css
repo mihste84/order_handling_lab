@@ -1,0 +1,22 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.styled-scrollbars::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.styled-scrollbars::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 5rem;
+}
+.styled-scrollbars::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.centered-popper {
+  transform: translate(-50%, -50%) !important;
+  z-index: auto !important;
+  background-color: white !important;
+}

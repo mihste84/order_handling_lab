@@ -1,5 +1,4 @@
 using FluentValidation;
-using Models.Constants;
 
 namespace AppLogic.Common.Validators;
 
@@ -20,5 +19,6 @@ public class SearchItemValidator : AbstractValidator<SearchItem>
         RuleFor(x => x.Operator)
             .NotEmpty()
             .WithName("Search Item Operator");
+        RuleFor(_ => _.HandleAutomatically).NotNull().WithName("Handle Automatically");
     }
 }

@@ -13,6 +13,11 @@ public class CityRepository : ICityRepository
         _transaction = transaction;
     }
 
+    public async Task<IEnumerable<City>> SelectAll() {
+        var sql = "SELECT * FROM Cities";
+        return await _transaction.Connection.QueryAsync<City>(sql, transaction: _transaction);
+    }
+
     public async Task<City?> GetByIdAsync(int id )
     {
         var sql = "SELECT * FROM Cities WHERE Id = @Id";
@@ -25,14 +30,14 @@ public class CityRepository : ICityRepository
         return await _transaction.Connection.QueryFirstOrDefaultAsync<City>(sql, new { Name = name }, transaction: _transaction);
     }
 
-    public async Task<int?> InsertAsync(City entity )
+    public async Task<SqlResult?> InsertAsync(City entity )
     {
         var sql = """
             INSERT INTO Cities (Name, CountryId, CreatedBy, UpdatedBy) 
-            OUTPUT INSERTED.[Id] 
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion
             VALUES (@Name, @CountryId, @CreatedBy, @UpdatedBy);
         """;
-        return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, transaction: _transaction);
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, transaction: _transaction);
     }
 
     public async Task<bool> DeleteByIdAsync(int id )
@@ -41,7 +46,7 @@ public class CityRepository : ICityRepository
         return (await _transaction.Connection.ExecuteAsync(sql, new { Id = id }, transaction: _transaction))> 0;
     }
 
-    public async Task<bool> UpdateAsync(City entity )
+    public async Task<SqlResult> UpdateAsync(City entity )
     {
         var sql = """
             UPDATE Cities 
@@ -49,8 +54,9 @@ public class CityRepository : ICityRepository
                 CountryId = @CountryId,               
                 UpdatedBy = @UpdatedBy,
                 Updated = @Updated
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion
             WHERE Id = @Id
         """;
-        return await _transaction.Connection.ExecuteAsync(sql, entity, transaction: _transaction) > 0;
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, transaction: _transaction);
     }
 }

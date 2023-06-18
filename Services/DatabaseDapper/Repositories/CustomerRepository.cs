@@ -1,6 +1,4 @@
 
-using Models.Constants;
-using Models.Values;
 
 namespace Services.DatabaseDapper.Repositories;
 
@@ -94,15 +92,14 @@ public class CustomerRepository : ICustomerRepository
     {
         var customerQuery = _transaction.Connection.QueryBuilder($@"
             SELECT * FROM (
-                SELECT 
-                    ROW_NUMBER() OVER (ORDER BY c.Id ASC) AS RowNumber
-                    ,c.[Id] 
-                    ,FirstName
-                    ,LastName
-                    ,MiddleName
-                    ,Ssn
-                    ,Code
-                    ,Name
+                SELECT
+                    c.[Id] 
+                    ,cp.FirstName
+                    ,cp.LastName
+                    ,cp.MiddleName
+                    ,cp.Ssn
+                    ,co.Code
+                    ,co.Name
                     ,[Active]
                     ,c.[CreatedBy]
                     ,c.[Created]
@@ -115,8 +112,8 @@ public class CustomerRepository : ICustomerRepository
                 LEFT JOIN dbo.CustomerPersons cp ON c.[Id] = cp.[CustomerId]
                 /**where**/
             ) x
-            WHERE RowNumber between {query.StartRow} and {query.EndRow}    
-            ORDER BY {query.OrderBy:raw} {query.OrderByDirection:raw};
+            ORDER BY {query.OrderBy:raw} {query.OrderByDirection:raw}
+            OFFSET {query.StartRow:raw} ROWS FETCH NEXT {(query.EndRow - query.StartRow):raw} ROWS ONLY;
 
             SELECT count(*) FROM [dbo].[Customers] c
             LEFT JOIN dbo.CustomerCompanies co ON c.[Id] = co.[CustomerId]
@@ -124,18 +121,22 @@ public class CustomerRepository : ICustomerRepository
             /**where**/    
         ");
         
-        foreach(var searchItem in query.SearchItems.Where(_ => _.IsBaseWhere)) {
+        foreach(var searchItem in query.SearchItems.Where(_ => _.HandleAutomatically)) {
             var sql = DynamicSearchQuery.GetWhereFromSearchItem(searchItem);
             customerQuery.Where(sql);
         }
             
         if (DynamicSearchQuery.TryExtractSearchItemByName(query.SearchItems, "Phone", out var item)) {
-            var sql = DynamicSearchQuery.GetWhereFromSearchItem(item!);
+            var sql = DynamicSearchQuery.GetWhereFromSearchItem(
+                new SearchItem("Value", item!.Value, item!.Operator, item!.HandleAutomatically) // Overwrite name to "Value"
+            );
             customerQuery.Where($"c.[Id] IN (SELECT [CustomerId] FROM [dbo].[CustomerContactInfo] WHERE {sql} AND Type = {ContactInfoType.Phone})");
         }
             
         if (DynamicSearchQuery.TryExtractSearchItemByName(query.SearchItems, "Email", out item)) {
-            var sql = DynamicSearchQuery.GetWhereFromSearchItem(item!);
+            var sql = DynamicSearchQuery.GetWhereFromSearchItem(
+                new SearchItem("Value", item!.Value, item!.Operator, item!.HandleAutomatically) // Overwrite name to "Value" 
+            );
             customerQuery.Where($"c.[Id] IN (SELECT [CustomerId] FROM [dbo].[CustomerContactInfo] WHERE {sql} AND Type = {ContactInfoType.Email})");
         }
 
@@ -170,7 +171,8 @@ public class CustomerRepository : ICustomerRepository
             CustomerPerson = _.IsPerson == 1 ? new CustomerPerson {
                 FirstName = _.FirstName,
                 LastName = _.LastName,
-                MiddleName = _.MiddleName
+                MiddleName = _.MiddleName,
+                Ssn = _.Ssn
             } : null
         }));
     }
@@ -211,14 +213,15 @@ public class CustomerRepository : ICustomerRepository
         return customer;
     }
 
-    public async Task<int?> InsertAsync(Customer entity )
+    public async Task<SqlResult?> InsertAsync(Customer entity )
     {
         var sql = """
             INSERT INTO Customers (Active, CreatedBy, UpdatedBy) 
-            OUTPUT INSERTED.[Id] 
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion 
             VALUES (@Active, @CreatedBy, @UpdatedBy);
         """;
-        return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, transaction: _transaction);
+
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, transaction: _transaction);
     }
 
     public async Task<bool> DeleteByIdAsync(int id )
@@ -227,16 +230,17 @@ public class CustomerRepository : ICustomerRepository
         return (await _transaction.Connection.ExecuteAsync(sql, new { Id = id }, transaction: _transaction))> 0;
     }
 
-    public async Task<bool> UpdateAsync(Customer entity )
+    public async Task<SqlResult> UpdateAsync(Customer entity )
     {
         var sql = """
             UPDATE Customers 
             SET Active = @Active,
                 UpdatedBy = @UpdatedBy,
                 Updated = @Updated
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion 
             WHERE Id = @Id
         """;
-        return await _transaction.Connection.ExecuteAsync(sql, entity, transaction: _transaction) > 0;
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, transaction: _transaction);
     }
 
     private async Task<Customer?> BaseQueryCustomerAsync(string sql, object param)

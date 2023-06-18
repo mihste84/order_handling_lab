@@ -57,7 +57,7 @@ public class CustomerPersonCommandTests
     public async Task InsertCustomerPersonCommand_No_Insert_Fail() 
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
-        mockUnitOfWork.Setup(x => x.CustomerPersonRepository.InsertAsync(It.IsAny<CustomerPerson>())).ReturnsAsync((int?)null);
+        mockUnitOfWork.Setup(x => x.CustomerPersonRepository.InsertAsync(It.IsAny<CustomerPerson>())).ReturnsAsync((SqlResult?)null);
 
         var command = new InsertCustomerPersonCommand {           
             FirstName = "John",
@@ -88,7 +88,7 @@ public class CustomerPersonCommandTests
             FirstName = "Stefan",
             LastName = "Mihailovic",
             Ssn = "1234567890",
-            CustomerPersonId = 1,
+            Id = 1,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
         };
         var handler = new UpdateCustomerPersonCommand.UpdateCustomerPersonHandler(
@@ -139,7 +139,7 @@ public class CustomerPersonCommandTests
             FirstName = "Stefan",
             LastName = "Mihailovic",
             Ssn = "1234567890",
-            CustomerPersonId = 1,        
+            Id = 1,        
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
         };
         var handler = new UpdateCustomerPersonCommand.UpdateCustomerPersonHandler(
@@ -165,7 +165,7 @@ public class CustomerPersonCommandTests
             FirstName = "Stefan",
             LastName = "Mihailovic",
             Ssn = "1234567890",
-            CustomerPersonId = 1,        
+            Id = 1,        
             RowVersion = new byte[] { 11, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
         };
         var handler = new UpdateCustomerPersonCommand.UpdateCustomerPersonHandler(
@@ -253,17 +253,17 @@ public class CustomerPersonCommandTests
 
     private Mock<IUnitOfWork> GetMockUnitOfWork(RepoitoryReturnValues returnValues) {
         var mockUnitOfWork = new Mock<IUnitOfWork>();
-        
+        var res = new SqlResult { Id = returnValues.CustomerPersonId };
         var mockCustomerPersonRepository = new Mock<ICustomerPersonRepository>();
         mockCustomerPersonRepository
             .Setup(x => x.InsertAsync(It.IsAny<CustomerPerson>()))
-            .ReturnsAsync(returnValues.CustomerPersonId);
+            .ReturnsAsync(res);
         mockCustomerPersonRepository
             .Setup(x => x.DeleteByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(returnValues.DeleCustomer);
         mockCustomerPersonRepository
             .Setup(x => x.UpdateAsync(It.IsAny<CustomerPerson>()))
-            .ReturnsAsync(returnValues.UpdateCustomer);
+            .ReturnsAsync(res);
         mockCustomerPersonRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(new CustomerPerson() { 

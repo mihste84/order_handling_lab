@@ -1,0 +1,43 @@
+<ul class="inline-flex mb-0">
+  <li>
+    <span
+      class="me-1 opacity-50"
+      [ngClass]="page > 1 && page != 1 ? 'cursor-pointer hover:opacity-100' : 'cursor-not-allowed'"
+      (click)="onFirstPage()"
+    >
+      <fa-icon [icon]="faAnglesLeft" size="lg" />
+    </span>
+  </li>
+  <li>
+    <span
+      class="me-1 opacity-50"
+      [ngClass]="page > 1 ? 'cursor-pointer hover:opacity-100' : 'cursor-not-allowed'"
+      (click)="onPreviousPage()"
+    >
+      <fa-icon [icon]="faAngleLeft" size="lg" />
+    </span>
+  </li>
+
+  <li class="disabled me-1">
+    <span class="">Page {{ page }} of {{ getTotalPagesDisplay() }}</span>
+  </li>
+
+  <li>
+    <span
+      class="me-1 opacity-50"
+      [ngClass]="canSelectNextPage() ? 'cursor-pointer hover:opacity-100' : 'cursor-not-allowed'"
+      (click)="onNextPage()"
+    >
+      <fa-icon [icon]="faAngleRight" size="lg" />
+    </span>
+  </li>
+  <li>
+    <span
+      class="me-1 opacity-50"
+      [ngClass]="getTotalPages() > page ? 'cursor-pointer hover:opacity-100' : 'cursor-not-allowed'"
+      (click)="onLastPage()"
+    >
+      <fa-icon [icon]="faAnglesRight" size="lg" />
+    </span>
+  </li>
+</ul>

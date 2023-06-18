@@ -2,12 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "cbuild",
+      "label": "restore",
       "command": "dotnet",
       "type": "process",
       "args": [
-        "build",
-        "${workspaceFolder}/ConsoleLab/ConsoleLab.csproj",
+        "restore",
+        "${workspaceFolder}/App/App.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -19,7 +19,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/API/API.csproj",
+        "${workspaceFolder}/App/App.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -31,7 +31,7 @@
       "type": "process",
       "args": [
         "publish",
-        "${workspaceFolder}/API/API.csproj",
+        "${workspaceFolder}/App/App.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -45,7 +45,7 @@
         "watch",
         "run",
         "--project",
-        "${workspaceFolder}/API/API.csproj"
+        "${workspaceFolder}/App/App.csproj"
       ],
       "problemMatcher": "$msCompile"
     }

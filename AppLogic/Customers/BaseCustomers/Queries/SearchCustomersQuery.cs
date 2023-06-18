@@ -7,7 +7,7 @@ public class SearchCustomersQuery : DynamicSearchQuery, IRequest<OneOf<Success<S
     public class SearchCustomerValidator : AbstractValidator<SearchCustomersQuery>
     {
         private readonly string[] _allowedSearchFields = new[] { 
-            "FirstName", "LastName", "MiddleName", "Code", "Name", "CountryId", "CityId", "Address", "Email", "Phone", "Active" 
+            "FirstName", "LastName", "MiddleName", "Ssn", "Code", "Name", "CountryId", "CityId", "Address", "Email", "Phone", "Active" 
         };
         public SearchCustomerValidator()
         {
@@ -36,10 +36,9 @@ public class SearchCustomersQuery : DynamicSearchQuery, IRequest<OneOf<Success<S
             if (searchResult == null || searchResult.Items?.Any() == false)
                 return new NotFound();
 
-            var mapper = new CustomerMapper();
             var dto = new SearchResultDto<SearchCustomerDto>(
                 TotalCount: searchResult.TotalCount,
-                Items: searchResult.Items!.Select(mapper.MapCustomerToSearchCustomerDto),
+                Items: searchResult.Items!.Select(MapCustomerToSearchCustomerDto),
                 StartRow: request.StartRow,
                 EndRow: request.EndRow,
                 OrderBy: request.OrderBy,
@@ -48,5 +47,22 @@ public class SearchCustomersQuery : DynamicSearchQuery, IRequest<OneOf<Success<S
                         
             return new Success<SearchResultDto<SearchCustomerDto>>(dto);
         }
+
+        private SearchCustomerDto MapCustomerToSearchCustomerDto(Customer customer)
+        => new(
+            Id: customer.Id,
+            Name: customer.CustomerCompany?.Name,
+            Code: customer.CustomerCompany?.Code,
+            FirstName: customer.CustomerPerson?.FirstName,
+            LastName: customer.CustomerPerson?.LastName,
+            MiddleName: customer.CustomerPerson?.MiddleName,
+            Ssn: customer.CustomerPerson?.Ssn,
+            Active: customer.Active,
+            CreatedBy: customer.CreatedBy,
+            UpdatedBy: customer.UpdatedBy,
+            Created: customer.Created,
+            Updated: customer.Updated,
+            IsCompany: customer.CustomerCompany != null
+        );
     }
 }

@@ -1,6 +1,6 @@
 namespace AppLogic.Customers.CustomerCompanies.Commands;
 
-public class InsertCustomerCompanyCommand : IRequest<OneOf<Success<int?>, Error<string>, ValidationError>>
+public class InsertCustomerCompanyCommand : IRequest<OneOf<Success<SqlResult>, Error<string>, ValidationError>>
 {
     public int? CustomerId { get; set; }
     public string? Code { get; set; }
@@ -15,12 +15,11 @@ public class InsertCustomerCompanyCommand : IRequest<OneOf<Success<int?>, Error<
         }
     }
 
-    public class InsertCustomerCompanyHandler : IRequestHandler<InsertCustomerCompanyCommand, OneOf<Success<int?>, Error<string>, ValidationError>>
+    public class InsertCustomerCompanyHandler : IRequestHandler<InsertCustomerCompanyCommand, OneOf<Success<SqlResult>, Error<string>, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<InsertCustomerCompanyCommand> _validator;
         private readonly IAuthenticationService _authenticationService;
-        private readonly CustomerMapper _mapper = new();
         public InsertCustomerCompanyHandler(
             IUnitOfWork unitOfWork, 
             IValidator<InsertCustomerCompanyCommand> validator, 
@@ -31,7 +30,7 @@ public class InsertCustomerCompanyCommand : IRequest<OneOf<Success<int?>, Error<
             _authenticationService = authenticationService;
         }
 
-        public async Task<OneOf<Success<int?>, Error<string>, ValidationError>> Handle(
+        public async Task<OneOf<Success<SqlResult>, Error<string>, ValidationError>> Handle(
             InsertCustomerCompanyCommand request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request);
@@ -40,14 +39,23 @@ public class InsertCustomerCompanyCommand : IRequest<OneOf<Success<int?>, Error<
 
             var username = _authenticationService.GetUserName();
 
-            var customer = _mapper.MapCommandToCustomerCompanyWithParams(request, username);
-            var id = await _unitOfWork.CustomerCompanyRepository.InsertAsync(customer);
-            if (id == null)
+            var customer = MapModelToCustomerCompany(request, username);
+            var res = await _unitOfWork.CustomerCompanyRepository.InsertAsync(customer);
+            if (res == null)
                 return new Error<string>("Failed to insert customer company.");
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new Success<int?>(id);
+            return new Success<SqlResult>(res);
         }
+
+        private CustomerCompany MapModelToCustomerCompany(InsertCustomerCompanyCommand model, string username)
+        => new() {
+            CustomerId = model.CustomerId,
+            Code = model.Code,
+            Name = model.Name,
+            CreatedBy = username,
+            UpdatedBy = username
+        };
     }
 }

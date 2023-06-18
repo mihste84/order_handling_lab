@@ -1,4 +1,6 @@
 
+using Models.Exceptions;
+
 namespace Services.DatabaseDapper.Repositories;
 
 public class CustomerCompanyRepository : ICustomerCompanyRepository
@@ -19,14 +21,19 @@ public class CustomerCompanyRepository : ICustomerCompanyRepository
         return await _transaction.Connection.QueryFirstOrDefaultAsync<CustomerCompany>(sql, new { Id = id }, transaction: _transaction);
     }
 
-    public async Task<int?> InsertAsync(CustomerCompany entity )
+    public async Task<SqlResult?> InsertAsync(CustomerCompany entity )
     {
         var sql = """
             INSERT INTO CustomerCompanies (Code, Name, CustomerId, CreatedBy, UpdatedBy) 
-            OUTPUT INSERTED.[Id]
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion 
             VALUES (@Code, @Name, @CustomerId, @CreatedBy, @UpdatedBy);
         """;
-        return await _transaction.Connection.ExecuteScalarAsync<int>(sql, entity, transaction: _transaction);
+        try {
+            return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, transaction: _transaction);
+        } 
+        catch(SqlException ex) when (ex.Message?.Contains("Cannot insert duplicate key") == true) { //(ex.Number == 2627) {
+            throw new UniqueConstraintException("Cannot insert customer. Company Code already exists.");
+        }
     }
 
     public async Task<bool> DeleteByIdAsync(int id )
@@ -35,7 +42,7 @@ public class CustomerCompanyRepository : ICustomerCompanyRepository
         return (await _transaction.Connection.ExecuteAsync(sql, new { Id = id }, transaction: _transaction)) > 0;
     }
 
-    public async Task<bool> UpdateAsync(CustomerCompany entity )
+    public async Task<SqlResult> UpdateAsync(CustomerCompany entity )
     {
         var sql = """
             UPDATE CustomerCompanies 
@@ -44,8 +51,9 @@ public class CustomerCompanyRepository : ICustomerCompanyRepository
                 CustomerId = @CustomerId,
                 UpdatedBy = @UpdatedBy,
                 Updated = @Updated
+            OUTPUT INSERTED.[Id], INSERTED.RowVersion 
             WHERE Id = @Id
         """;
-        return await _transaction.Connection.ExecuteAsync(sql, entity, transaction: _transaction) > 0;
+        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, transaction: _transaction);
     }
 }
