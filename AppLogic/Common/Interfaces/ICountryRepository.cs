@@ -1,7 +1,6 @@
 namespace AppLogic.Common.Interfaces;
 
-public interface ICountryRepository : IBaseRepository<Country>
+public interface ICountryRepository
 {
-    Task<Country?> GetByNameAsync(string name );
     Task<IEnumerable<Country>> SelectAll();
 }

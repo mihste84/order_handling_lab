@@ -1,7 +1,6 @@
 namespace AppLogic.Common.Interfaces;
 
-public interface ICityRepository : IBaseRepository<City>
+public interface ICityRepository
 {
-    Task<City?> GetByNameAsync(string name );
     Task<IEnumerable<City>> SelectAll();
 }

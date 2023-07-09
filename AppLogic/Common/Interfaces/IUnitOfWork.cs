@@ -8,6 +8,6 @@ public interface IUnitOfWork
     ICustomerCompanyRepository CustomerCompanyRepository { get; }
     ICustomerPersonRepository CustomerPersonRepository { get; }
     ICustomerContactInfoRepository CustomerContactInfoRepository { get; }
-    ICustomerAddressesRepository CustomerAddressesRepository { get; }
+    ICustomerAddressRepository CustomerAddressRepository { get; }
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

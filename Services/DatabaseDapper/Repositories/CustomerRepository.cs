@@ -242,20 +242,4 @@ public class CustomerRepository : ICustomerRepository
         """;
         return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, transaction: _transaction);
     }
-
-    private async Task<Customer?> BaseQueryCustomerAsync(string sql, object param)
-    {
-        var customer = (await _transaction.Connection.QueryAsync<Customer, CustomerCompany, CustomerPerson, Customer>(
-                sql,
-                (c, cc, cp) =>
-                {
-                    c.CustomerCompany = cc;
-                    c.CustomerPerson = cp;
-                    return c;
-                },
-                param, 
-                transaction: _transaction
-            )).AsQueryable();
-        return customer?.FirstOrDefault();  
-    }
 }

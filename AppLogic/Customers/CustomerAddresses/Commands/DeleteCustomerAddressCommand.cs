@@ -31,7 +31,7 @@ public class DeleteCustomerAddressCommand : IRequest<OneOf<Success, Error<string
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
 
-            var success = await _unitOfWork.CustomerAddressesRepository.DeleteByIdAsync(request.Id!.Value);
+            var success = await _unitOfWork.CustomerAddressRepository.DeleteByIdAsync(request.Id!.Value);
             if (!success)
                 return new Error<string>("Failed to delete customer address.");
 

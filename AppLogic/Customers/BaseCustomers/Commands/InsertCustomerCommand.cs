@@ -71,7 +71,7 @@ public class InsertCustomerCommand : IRequest<OneOf<Success<SqlResult>, Error<st
                 return new Error<string>("Failed to create new customer.");
 
             var addresses = request.CustomerAddresses!.Select(_ => MapModelToCustomerAddress(_, customerRes.Id, username));
-            if (!await _unitOfWork.CustomerAddressesRepository.InsertMultipleAsync(addresses))
+            if (!await _unitOfWork.CustomerAddressRepository.InsertMultipleAsync(addresses))
                 return new Error<string>("Failed to create new customer addresses.");
             
             var contactInfo = request.ContactInfo!.Select(_ => MapModelToCustomerContactInfo(_, customerRes.Id, username));                     

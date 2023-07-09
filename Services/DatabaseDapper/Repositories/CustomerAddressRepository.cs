@@ -1,10 +1,10 @@
 namespace Services.DatabaseDapper.Repositories;
 
-public class CustomerAddressesRepository : ICustomerAddressesRepository
+public class CustomerAddressRepository : ICustomerAddressRepository
 {
     private readonly IDbTransaction _transaction;
 
-    public CustomerAddressesRepository(IDbTransaction? transaction)
+    public CustomerAddressRepository(IDbTransaction? transaction)
     {
         if (transaction == null)
             throw new ArgumentNullException(nameof(transaction));
@@ -24,11 +24,6 @@ public class CustomerAddressesRepository : ICustomerAddressesRepository
         return await _transaction.Connection.QueryFirstOrDefaultAsync<CustomerAddress>(sql, new { Id = id }, _transaction);
     }
 
-    public async Task<IEnumerable<CustomerAddress>> GetByCustomerIdAsync(int? customerId)
-    {
-        var sql = "SELECT * FROM CustomerAddresses WHERE CustomerId = @CustomerId";
-        return await _transaction.Connection.QueryAsync<CustomerAddress>(sql, new { CustomerId = customerId }, _transaction);
-    }
 
     public async Task<SqlResult?> InsertAsync(CustomerAddress entity )
     {

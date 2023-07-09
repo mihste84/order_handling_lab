@@ -24,12 +24,6 @@ public class CustomerContactInfoRepository  : ICustomerContactInfoRepository {
         return await _transaction.Connection.QueryFirstOrDefaultAsync<CustomerContactInfo>(sql, new { Id = id }, _transaction);
     }
 
-    public async Task<IEnumerable<CustomerContactInfo>> GetByCustomerIdAsync(int? customerId)
-    {
-        var sql = "SELECT * FROM CustomerContactInfo WHERE CustomerId = @CustomerId";
-        return await _transaction.Connection.QueryAsync<CustomerContactInfo>(sql, new { CustomerId = customerId }, _transaction);
-    }
-
     public async Task<SqlResult?> InsertAsync(CustomerContactInfo entity)
     {
         var sql = """

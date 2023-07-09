@@ -26,8 +26,8 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
     private ICustomerContactInfoRepository? _customerContactInfoRepository;
     public ICustomerContactInfoRepository CustomerContactInfoRepository => _customerContactInfoRepository ?? (_customerContactInfoRepository = new CustomerContactInfoRepository(_transaction));
 
-    private ICustomerAddressesRepository? _customerAddressesRepository;
-    public ICustomerAddressesRepository CustomerAddressesRepository => _customerAddressesRepository ?? (_customerAddressesRepository = new CustomerAddressesRepository(_transaction));
+    private ICustomerAddressRepository? _customerAddressRepository;
+    public ICustomerAddressRepository CustomerAddressRepository => _customerAddressRepository ?? (_customerAddressRepository = new CustomerAddressRepository(_transaction));
     public DapperUnitOfWork(IDbConnection connection, ILogger<DapperUnitOfWork>? logger)
     {
         _connection = connection;

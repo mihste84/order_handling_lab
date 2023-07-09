@@ -28,10 +28,10 @@ public class CustomerAddressCommandTests
 
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT0);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
     }
 
     [Fact]
@@ -57,10 +57,10 @@ public class CustomerAddressCommandTests
 
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT0);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Once);
     }
 
     [Fact]
@@ -81,17 +81,17 @@ public class CustomerAddressCommandTests
         Assert.True(result.IsT2);
         var errors = result.AsT2.Errors;
         Assert.Equal(6, errors.Count());
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.Never);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Never);
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
     }
 
     [Fact]
     public async Task InsertCustomerAddressCommand_No_Insert_Fail() 
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() );
-        mockUnitOfWork.Setup(x => x.CustomerAddressesRepository.InsertAsync(It.IsAny<CustomerAddress>())).ReturnsAsync((SqlResult?)null);
+        mockUnitOfWork.Setup(x => x.CustomerAddressRepository.InsertAsync(It.IsAny<CustomerAddress>())).ReturnsAsync((SqlResult?)null);
 
         var command = new InsertCustomerAddressCommand {           
             Address = "Test Address",
@@ -112,10 +112,10 @@ public class CustomerAddressCommandTests
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT1);
         Assert.Equal("Failed to insert customer address.", result.AsT1.Value);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
     }
     
     [Fact]
@@ -142,11 +142,11 @@ public class CustomerAddressCommandTests
 
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT0);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
     } 
 
     [Fact]
@@ -173,11 +173,11 @@ public class CustomerAddressCommandTests
 
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT0);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Once);
     } 
 
     [Fact]
@@ -198,17 +198,17 @@ public class CustomerAddressCommandTests
         Assert.True(result.IsT3);
         var errors = result.AsT3.Errors;
         Assert.Equal(8, errors.Count());
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.Never);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Never);
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.GetByIdAsync(It.IsAny<int>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
     } 
 
     [Fact]
     public async Task UpdateCustomerAddressCommand_Not_Found_Fail() {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
-        mockUnitOfWork.Setup(x => x.CustomerAddressesRepository.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((CustomerAddress?)null);
+        mockUnitOfWork.Setup(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((CustomerAddress?)null);
 
         var command = new UpdateCustomerAddressCommand {           
             Address = "Test Address",
@@ -230,11 +230,11 @@ public class CustomerAddressCommandTests
 
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT2);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce);
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
     } 
 
     [Fact]
@@ -262,11 +262,11 @@ public class CustomerAddressCommandTests
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT1);
         Assert.Equal("Customer address has been updated by another user. Please refresh the page and try again.", result.AsT1.Value);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce);
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.UpdateAsync(It.IsAny<CustomerAddress>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
     } 
 
     [Fact]
@@ -283,9 +283,9 @@ public class CustomerAddressCommandTests
 
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT0);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Once);
     } 
 
     [Fact]
@@ -302,9 +302,9 @@ public class CustomerAddressCommandTests
         Assert.True(result.IsT2);
         var errors = result.AsT2.Errors;
         Assert.Single(errors);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.Never());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Never());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Never);
     } 
 
     [Fact]
@@ -322,9 +322,9 @@ public class CustomerAddressCommandTests
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.True(result.IsT1);
         Assert.Equal("Failed to delete customer address.", result.AsT1.Value);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.AtLeastOnce());
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.CustomerAddressesRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Once);
     } 
 
     private record RepoitoryReturnValues(
@@ -339,7 +339,7 @@ public class CustomerAddressCommandTests
     private Mock<IUnitOfWork> GetMockUnitOfWork(RepoitoryReturnValues returnValues) {
         var mockUnitOfWork = new Mock<IUnitOfWork>();
         
-        var mockCustomerAddressRepository = new Mock<ICustomerAddressesRepository>();
+        var mockCustomerAddressRepository = new Mock<ICustomerAddressRepository>();
         mockCustomerAddressRepository
             .Setup(x => x.InsertAsync(It.IsAny<CustomerAddress>()))
             .ReturnsAsync(new SqlResult { Id = returnValues.CustomerAddressId });
@@ -363,7 +363,7 @@ public class CustomerAddressCommandTests
                 RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } 
             });
 
-        mockUnitOfWork.SetupGet(x => x.CustomerAddressesRepository).Returns(mockCustomerAddressRepository.Object);
+        mockUnitOfWork.SetupGet(x => x.CustomerAddressRepository).Returns(mockCustomerAddressRepository.Object);
 
         return mockUnitOfWork;
     }

@@ -51,7 +51,7 @@ public class BaseCustomersCommandTests
         mockUnitOfWork.VerifyGet(x => x.CustomerPersonRepository, Times.Once);
         mockUnitOfWork.VerifyGet(x => x.CustomerCompanyRepository, Times.Never);
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.Once);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.Once);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Once);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class BaseCustomersCommandTests
         mockUnitOfWork.VerifyGet(x => x.CustomerPersonRepository, Times.Never);
         mockUnitOfWork.VerifyGet(x => x.CustomerCompanyRepository, Times.Once);
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.Once);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.Once);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Once);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class BaseCustomersCommandTests
         mockUnitOfWork.VerifyGet(x => x.CustomerPersonRepository, Times.Never);
         mockUnitOfWork.VerifyGet(x => x.CustomerCompanyRepository, Times.Never);
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.Never);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.Never);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Never);
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class BaseCustomersCommandTests
         mockUnitOfWork.VerifyGet(x => x.CustomerPersonRepository, Times.Never);
         mockUnitOfWork.VerifyGet(x => x.CustomerCompanyRepository, Times.Never);
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.Never);
-        mockUnitOfWork.VerifyGet(x => x.CustomerAddressesRepository, Times.Never);
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Never);
     }
 
     [Fact]
@@ -461,8 +461,8 @@ public class BaseCustomersCommandTests
             Setup(x => x.InsertMultipleAsync(It.IsAny<IEnumerable<CustomerContactInfo>>()))
             .ReturnsAsync(returnValues.CustomerContactInfo);
         
-        var mockCustomerAddressesRepository = new Mock<ICustomerAddressesRepository>();
-        mockCustomerAddressesRepository
+        var mockCustomerAddressRepository = new Mock<ICustomerAddressRepository>();
+        mockCustomerAddressRepository
             .Setup(x => x.InsertMultipleAsync(It.IsAny<IEnumerable<CustomerAddress>>()))
             .ReturnsAsync(returnValues.CustomerAddresses);
         
@@ -471,7 +471,7 @@ public class BaseCustomersCommandTests
         mockUnitOfWork.SetupGet(x => x.CustomerPersonRepository).Returns(mockCustomerPersonRepository.Object);
         mockUnitOfWork.SetupGet(x => x.CustomerCompanyRepository).Returns(mockCustomerCompanyRepository.Object);
         mockUnitOfWork.SetupGet(x => x.CustomerContactInfoRepository).Returns(mockCustomerContactInfoRepository.Object);
-        mockUnitOfWork.SetupGet(x => x.CustomerAddressesRepository).Returns(mockCustomerAddressesRepository.Object);
+        mockUnitOfWork.SetupGet(x => x.CustomerAddressRepository).Returns(mockCustomerAddressRepository.Object);
 
         return mockUnitOfWork;
     }

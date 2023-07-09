@@ -42,7 +42,7 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
                 
             var username = _authenticationService.GetUserName();
 
-            var address = await _unitOfWork.CustomerAddressesRepository.GetByIdAsync(request.Id!.Value);
+            var address = await _unitOfWork.CustomerAddressRepository.GetByIdAsync(request.Id!.Value);
             if (address == null)
                 return new NotFound();
             if (!address.RowVersion!.SequenceEqual(request.RowVersion!))
@@ -58,9 +58,9 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             address.Updated = _dateTimeService.GetUtc();
 
             if (request.IsPrimary == true)
-                await _unitOfWork.CustomerAddressesRepository.RemoveAllPrimaryAsync(request.CustomerId!.Value);
+                await _unitOfWork.CustomerAddressRepository.RemoveAllPrimaryAsync(request.CustomerId!.Value);
             
-            var res = await _unitOfWork.CustomerAddressesRepository.UpdateAsync(address);
+            var res = await _unitOfWork.CustomerAddressRepository.UpdateAsync(address);
             if (res == null)
                 return new Error<string>("Failed to update customer address.");
 

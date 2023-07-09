@@ -40,9 +40,9 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             var address = MapModelToCustomerAddress(request, username);
             
             if (request.IsPrimary == true)
-                await _unitOfWork.CustomerAddressesRepository.RemoveAllPrimaryAsync(request.CustomerId);
+                await _unitOfWork.CustomerAddressRepository.RemoveAllPrimaryAsync(request.CustomerId);
             
-            var res = await _unitOfWork.CustomerAddressesRepository.InsertAsync(address);
+            var res = await _unitOfWork.CustomerAddressRepository.InsertAsync(address);
             if (res == null)
                 return new Error<string>("Failed to insert customer address.");
 
