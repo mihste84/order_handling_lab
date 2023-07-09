@@ -86,6 +86,18 @@ public static class CustomerQueries
         VALUES (@Active, @CreatedBy, @UpdatedBy);
     """;
 
+    public const string InsertNew = 
+    """
+        DECLARE @IdentityValue TABLE (ContactID int);
+
+        INSERT INTO Customers (Active, CreatedBy, UpdatedBy) 
+        OUTPUT INSERTED.[Id], INSERTED.RowVersion INTO @IdentityValue
+        VALUES (@Active, @CreatedBy, @UpdatedBy);
+
+        INSERT INTO CustomerPersons (CustomerId, FirstName, LastName, MiddleName, Ssn, CreatedBy, UpdatedBy)
+        SELECT ContactID, @FirstName, @LastName, @MiddleName, @Ssn, @CreatedBy, @UpdatedBy FROM @IdentityValue;
+    """;
+
     public static FormattableString GetSearchCustomersQuery(DynamicSearchQuery query) => 
     $@"
         SELECT * FROM (
