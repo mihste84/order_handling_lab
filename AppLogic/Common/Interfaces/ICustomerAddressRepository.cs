@@ -9,4 +9,5 @@ public interface ICustomerAddressRepository
     Task<SqlResult?> InsertAsync(CustomerAddress entity );
     Task<bool> DeleteByIdAsync(int id );
     Task<SqlResult> UpdateAsync(CustomerAddress entity );
+    Task<(IEnumerable<City> Cities, IEnumerable<Country> Countries)> GetAllReferenceData();
 }

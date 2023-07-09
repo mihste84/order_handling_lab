@@ -21,7 +21,7 @@ public static class SearchOperators
 
 public class DynamicSearchQuery
 {
-    public List<SearchItem> SearchItems { get; set; } = new();
+    public SearchItem[] SearchItems { get; set; } = Array.Empty<SearchItem>();
     public int StartRow { get; set; } = 0;
     public int EndRow { get; set; } = 10;
     public string OrderBy { get; set; } = "Id";

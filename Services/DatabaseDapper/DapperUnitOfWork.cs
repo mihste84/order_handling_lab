@@ -8,12 +8,6 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
     private IDbTransaction? _transaction;
     private ILogger<DapperUnitOfWork>? _logger;
 
-    private ICountryRepository? _countryRepository;
-    public ICountryRepository CountryRepository => _countryRepository ?? (_countryRepository = new CountryRepository(_transaction));
-
-    private ICityRepository? _cityRepository;
-    public ICityRepository CityRepository => _cityRepository ?? (_cityRepository = new CityRepository(_transaction));
-
     private ICustomerRepository? _customerRepository;
     public ICustomerRepository CustomerRepository => _customerRepository ?? (_customerRepository = new CustomerRepository(_transaction));
 
@@ -81,8 +75,6 @@ public class DapperUnitOfWork : IUnitOfWork, IDisposable
 
     private void ResetRepositories()
     {
-        _countryRepository = null;
-        _cityRepository = null;
         _customerRepository = null;
         _customerCompanyRepository = null;
         _customerPersonRepository = null;

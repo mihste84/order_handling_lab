@@ -16,12 +16,11 @@ public class SelectAllMasterDataQuery : IRequest<OneOf<Success<MasterDataDto>>>
 
         public async Task<OneOf<Success<MasterDataDto>>> Handle(SelectAllMasterDataQuery request, CancellationToken cancellationToken)
         {
-            var countries = await _unitOfWork.CountryRepository.SelectAll();            
-            var cities = await _unitOfWork.CityRepository.SelectAll();
+            var referenceTables = await _unitOfWork.CustomerAddressRepository.GetAllReferenceData();
             
             var masterDataDto = new MasterDataDto(
-                countries?.Select(_ => new CountryDto(_.Id, _.Name, _.Abbreviation, _.PhonePrefix)), 
-                cities?.Select(_ => new CityDto(_.Id, _.Name, _.CountryId))
+                referenceTables.Countries?.Select(_ => new CountryDto(_.Id, _.Name, _.Abbreviation, _.PhonePrefix)), 
+                referenceTables.Cities?.Select(_ => new CityDto(_.Id, _.Name, _.CountryId))
             );
 
             return new Success<MasterDataDto>(masterDataDto);

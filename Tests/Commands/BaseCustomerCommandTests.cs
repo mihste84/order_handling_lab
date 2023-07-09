@@ -319,7 +319,7 @@ public class BaseCustomersCommandTests
             .ReturnsAsync(new SearchResult<Customer>(2, resultCustomers));
         
         var query = new SearchCustomersQuery {
-            SearchItems = new List<SearchItem>()
+            SearchItems = Array.Empty<SearchItem>()
         };
 
         var handler = new SearchCustomersQuery.SearchCustomerHandler(
@@ -361,7 +361,7 @@ public class BaseCustomersCommandTests
     public async Task SearchCustomerQuery_Invalid_SearchItem_Name_Fail() {
         var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
         var query = new SearchCustomersQuery {
-            SearchItems = new List<SearchItem>() {
+            SearchItems = new [] {
                 new SearchItem(
                     "Test",
                     "Test",
@@ -390,7 +390,7 @@ public class BaseCustomersCommandTests
         var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
 
         var query = new SearchCustomersQuery {
-            SearchItems = new List<SearchItem>() {
+            SearchItems = new[] {
                 new SearchItem(
                     "FirstName",
                     "",

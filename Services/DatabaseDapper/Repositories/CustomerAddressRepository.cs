@@ -69,4 +69,15 @@ public class CustomerAddressRepository : ICustomerAddressRepository
         var sql = "UPDATE CustomerAddresses SET IsPrimary = 0 WHERE CustomerId = @CustomerId";
         await _transaction.Connection.QuerySingleAsync(sql, new { CustomerId = customerId }, _transaction);
     }
+
+    public async Task<(IEnumerable<City> Cities, IEnumerable<Country> Countries)> GetAllReferenceData() {
+        var sql = "SELECT * FROM Cities; SELECT * FROM Countries;";
+
+        var mapper = await _transaction.Connection.QueryMultipleAsync(sql,_transaction); 
+        
+        return (
+            await mapper.ReadAsync<City>(),
+            await mapper.ReadAsync<Country>()
+        );
+    }
 }
