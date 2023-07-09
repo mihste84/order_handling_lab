@@ -16,7 +16,7 @@ public class SelectAllMasterDataQuery : IRequest<OneOf<Success<MasterDataDto>>>
 
         public async Task<OneOf<Success<MasterDataDto>>> Handle(SelectAllMasterDataQuery request, CancellationToken cancellationToken)
         {
-            var referenceTables = await _unitOfWork.CustomerAddressRepository.GetAllReferenceData();
+            var referenceTables = await _unitOfWork.CustomerAddressRepository.GetAllReferenceDataAsync();
             
             var masterDataDto = new MasterDataDto(
                 referenceTables.Countries?.Select(_ => new CountryDto(_.Id, _.Name, _.Abbreviation, _.PhonePrefix)), 

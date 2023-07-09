@@ -13,67 +13,31 @@ public class CustomerAddressRepository : ICustomerAddressRepository
     }
 
     public async Task<bool> DeleteByIdAsync(int id )
-    {
-        var sql = "DELETE FROM CustomerAddresses WHERE Id = @Id";
-        return (await _transaction.Connection.ExecuteAsync(sql, new { Id = id }, _transaction)) > 0;
-    }
+    => (await _transaction.Connection.ExecuteAsync(CustomerAddressQueries.Delete, new { Id = id }, _transaction)) > 0;
+    
 
     public async Task<CustomerAddress?> GetByIdAsync(int id )
-    {
-        var sql = "SELECT * FROM CustomerAddresses WHERE Id = @Id";
-        return await _transaction.Connection.QueryFirstOrDefaultAsync<CustomerAddress>(sql, new { Id = id }, _transaction);
-    }
-
-
+    => await _transaction.Connection.QueryFirstOrDefaultAsync<CustomerAddress>(
+        CustomerAddressQueries.GetById, new { Id = id }, _transaction
+    );
+    
     public async Task<SqlResult?> InsertAsync(CustomerAddress entity )
-    {
-        var sql = """
-            INSERT INTO CustomerAddresses (Address, IsPrimary, PostArea, ZipCode, CountryId, CustomerId, CityId, CreatedBy, UpdatedBy)
-            OUTPUT INSERTED.[Id], INSERTED.RowVersion
-            VALUES (@Address, @IsPrimary, @PostArea, @ZipCode, @CountryId, @CustomerId, @CityId, @CreatedBy, @UpdatedBy);
-        """;
-
-        return await _transaction.Connection.QuerySingleAsync<SqlResult>(sql, entity, _transaction);
-    }
+    => await _transaction.Connection.QuerySingleAsync<SqlResult>(CustomerAddressQueries.Insert, entity, _transaction);
 
     public async Task<bool> InsertMultipleAsync(IEnumerable<CustomerAddress> addresses)
-    {
-        var sql = """
-            INSERT INTO CustomerAddresses (Address, IsPrimary, PostArea, ZipCode, CountryId, CustomerId, CityId, CreatedBy, UpdatedBy) 
-            VALUES (@Address, @IsPrimary, @PostArea, @ZipCode, @CountryId, @CustomerId, @CityId, @CreatedBy, @UpdatedBy);
-        """;
-
-        return await _transaction.Connection.ExecuteAsync(sql, addresses, _transaction) > 0;
-    }
+    =>await _transaction.Connection.ExecuteAsync(CustomerAddressQueries.InsertMultiple, addresses, _transaction) > 0;
 
     public async Task<SqlResult> UpdateAsync(CustomerAddress entity )
-    {
-        var sql = """
-            UPDATE CustomerAddresses 
-            SET Address = @Address,
-                Primary = @Primary,
-                PostArea = @PostArea,
-                ZipCode = @ZipCode,
-                CityId = @CityId,
-                CountryId = @CountryId,
-                UpdatedBy = @UpdatedBy,
-                Updated = @Updated
-            OUTPUT INSERTED.[Id], INSERTED.RowVersion
-            WHERE Id = @Id
-        """;
-        return await _transaction.Connection.ExecuteScalarAsync<SqlResult>(sql, entity, _transaction);
-    }
+    => await _transaction.Connection.ExecuteScalarAsync<SqlResult>(CustomerAddressQueries.Update, entity, _transaction);
 
     public async Task RemoveAllPrimaryAsync(int? customerId)
+    => await _transaction.Connection.QuerySingleAsync(
+        CustomerAddressQueries.RemoveAllPrimary, new { CustomerId = customerId }, _transaction
+    );
+    
+    public async Task<(IEnumerable<City> Cities, IEnumerable<Country> Countries)> GetAllReferenceDataAsync() 
     {
-        var sql = "UPDATE CustomerAddresses SET IsPrimary = 0 WHERE CustomerId = @CustomerId";
-        await _transaction.Connection.QuerySingleAsync(sql, new { CustomerId = customerId }, _transaction);
-    }
-
-    public async Task<(IEnumerable<City> Cities, IEnumerable<Country> Countries)> GetAllReferenceData() {
-        var sql = "SELECT * FROM Cities; SELECT * FROM Countries;";
-
-        var mapper = await _transaction.Connection.QueryMultipleAsync(sql,_transaction); 
+        var mapper = await _transaction.Connection.QueryMultipleAsync(CustomerAddressQueries.GetAllReferenceDataAsync,_transaction); 
         
         return (
             await mapper.ReadAsync<City>(),

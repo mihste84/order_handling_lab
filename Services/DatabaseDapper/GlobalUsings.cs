@@ -10,3 +10,4 @@ global using DapperQueryBuilder;
 global using AppLogic.Common.Models;
 global using Models.Constants;
 global using Models.Values;
+global using Services.DatabaseDapper.Queries;
