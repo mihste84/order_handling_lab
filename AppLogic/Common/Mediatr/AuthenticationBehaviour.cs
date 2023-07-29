@@ -1,5 +1,5 @@
 
-namespace AppLogic.Common.Mediatr;
+namespace Common.Mediatr;
 
 public class AuthenticationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {

@@ -1,8 +1,6 @@
 using FluentValidation.Results;
 
-
-namespace AppLogic.Common.Extensions;
-
+namespace Common.Extensions;
 
 public static class ValidationExtensions
 {

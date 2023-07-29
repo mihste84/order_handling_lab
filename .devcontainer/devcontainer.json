@@ -33,16 +33,18 @@
 
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
-        "ms-dotnettools.csharp",
-        "ms-mssql.mssql",
-        "ms-dotnettools.csharp",
-        "ms-mssql.data-workspace-vscode",
-        "GitHub.copilot",
-        "patcx.vscode-nuget-gallery",
-        "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss",
-        "chiadem.cs2ts-vscode-extension"
-      ]
+		"ms-dotnettools.csharp",
+		"ms-mssql.mssql",
+		"ms-dotnettools.csharp",
+		"ms-mssql.data-workspace-vscode",
+		"GitHub.copilot",
+		"patcx.vscode-nuget-gallery",
+		"esbenp.prettier-vscode",
+		"bradlc.vscode-tailwindcss",
+		"chiadem.cs2ts-vscode-extension",
+		"josefpihrt-vscode.roslynator",
+		"formulahendry.dotnet-test-explorer"
+	]
     }
   },
   "forwardPorts": [1433, 3000, 5299, 7206, 5173],

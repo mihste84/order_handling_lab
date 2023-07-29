@@ -1,7 +1,6 @@
-using AppLogic.Common.Interfaces;
+using Common.Interfaces;
 
 namespace App.Authentication;
-
 
 public class AuthenticationService : IAuthenticationService
 {

@@ -1,5 +1,4 @@
-namespace Services.DatabaseDapper.Queries;
-
+namespace DatabaseDapper.Queries;
 
 public static class CustomerAddressQueries
 {
@@ -10,8 +9,8 @@ public static class CustomerAddressQueries
     public const string Delete = "DELETE FROM CustomerAddresses WHERE Id = @Id";
 
     public const string RemoveAllPrimary = "UPDATE CustomerAddresses SET IsPrimary = 0 WHERE CustomerId = @CustomerId";
-    
-    public const string Update = 
+
+    public const string Update =
     """
         UPDATE CustomerAddresses 
         SET Address = @Address,
@@ -30,11 +29,10 @@ public static class CustomerAddressQueries
         INSERT INTO CustomerAddresses (Address, IsPrimary, PostArea, ZipCode, CountryId, CustomerId, CityId, CreatedBy, UpdatedBy) 
         VALUES (@Address, @IsPrimary, @PostArea, @ZipCode, @CountryId, @CustomerId, @CityId, @CreatedBy, @UpdatedBy);
     """;
-    public const string Insert = 
+    public const string Insert =
     """
         INSERT INTO CustomerAddresses (Address, IsPrimary, PostArea, ZipCode, CountryId, CustomerId, CityId, CreatedBy, UpdatedBy)
         OUTPUT INSERTED.[Id], INSERTED.RowVersion
         VALUES (@Address, @IsPrimary, @PostArea, @ZipCode, @CountryId, @CustomerId, @CityId, @CreatedBy, @UpdatedBy);
     """;
-
 }

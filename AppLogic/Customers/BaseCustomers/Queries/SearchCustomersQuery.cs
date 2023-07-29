@@ -1,13 +1,13 @@
-using AppLogic.Common.Validators;
+using Common.Validators;
 
-namespace AppLogic.Customers.BaseCustomers.Queries;
+namespace Customers.BaseCustomers.Queries;
 
 public class SearchCustomersQuery : DynamicSearchQuery, IRequest<OneOf<Success<SearchResultDto<SearchCustomerDto>>, NotFound, ValidationError>>
 {
     public class SearchCustomerValidator : AbstractValidator<SearchCustomersQuery>
     {
-        private readonly string[] _allowedSearchFields = new[] { 
-            "FirstName", "LastName", "MiddleName", "Ssn", "Code", "Name", "CountryId", "CityId", "Address", "Email", "Phone", "Active" 
+        private readonly string[] _allowedSearchFields = new[] {
+            "FirstName", "LastName", "MiddleName", "Ssn", "Code", "Name", "CountryId", "CityId", "Address", "Email", "Phone", "Active"
         };
         public SearchCustomerValidator()
         {
@@ -28,7 +28,7 @@ public class SearchCustomersQuery : DynamicSearchQuery, IRequest<OneOf<Success<S
 
         public async Task<OneOf<Success<SearchResultDto<SearchCustomerDto>>, NotFound, ValidationError>> Handle(SearchCustomersQuery request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
 
@@ -44,7 +44,7 @@ public class SearchCustomersQuery : DynamicSearchQuery, IRequest<OneOf<Success<S
                 OrderBy: request.OrderBy,
                 OrderByDirection: request.OrderByDirection
             );
-                        
+
             return new Success<SearchResultDto<SearchCustomerDto>>(dto);
         }
 

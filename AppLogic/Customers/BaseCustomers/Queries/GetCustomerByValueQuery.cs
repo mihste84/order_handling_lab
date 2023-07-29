@@ -1,8 +1,8 @@
 using Models.Constants;
 
-namespace AppLogic.Customers.BaseCustomers.Queries;
+namespace Customers.BaseCustomers.Queries;
 
-public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>, Success<CustomerCompanyDto>, Error<string>, NotFound, ValidationError>>
+public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerDto>, NotFound, ValidationError>>
 {
     public string? Type { get; set; }
     public string? Value { get; set; }
@@ -29,7 +29,7 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>
         }
     }
 
-    public class GetCustomerPersonBySsnHandler : IRequestHandler<GetCustomerByValueQuery, OneOf<Success<CustomerPersonDto>, Success<CustomerCompanyDto>, Error<string>, NotFound, ValidationError>>
+    public class GetCustomerPersonBySsnHandler : IRequestHandler<GetCustomerByValueQuery, OneOf<Success<CustomerDto>, NotFound, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<GetCustomerByValueQuery> _validator;
@@ -40,24 +40,20 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>
             _validator = validator;
         }
 
-        public async Task<OneOf<Success<CustomerPersonDto>, Success<CustomerCompanyDto>, Error<string>, NotFound, ValidationError>> Handle(
+        public async Task<OneOf<Success<CustomerDto>, NotFound, ValidationError>> Handle(
             GetCustomerByValueQuery request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
 
-            var customer = await GetCustomerAsync(request.Type!, request.Value!) ;
+            var customer = await GetCustomerAsync(request.Type!, request.Value!);
             if (customer == null)
                 return new NotFound();
 
-            if (customer.CustomerPerson != null && customer.CustomerCompany == null) 
-                return new Success<CustomerPersonDto>(MapToCustomerPersonDto(customer));
+            var dto = MapToCustomerDto(customer);
 
-            if (customer.CustomerPerson == null && customer.CustomerCompany != null)
-                return new Success<CustomerCompanyDto>(MapToCustomerCompanyDto(customer));
-
-            return new Error<string>("Customer cannot be both a person and a company.");
+            return new Success<CustomerDto>(dto);
         }
 
         private async Task<Customer?> GetCustomerAsync(string type, string value)
@@ -69,43 +65,28 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>
             _ => throw new ArgumentException("Invalid customer type", nameof(type))
         };
 
-        private CustomerCompanyDto MapToCustomerCompanyDto(Customer model) 
-        => new() {
+        private static CustomerDto MapToCustomerDto(Customer model)
+        => new()
+        {
             Active = model.Active,
-            Code = model.CustomerCompany!.Code,
-            Id = model.CustomerCompany.Id,
-            Name = model.CustomerCompany!.Name,
+            Code = model.CustomerCompany?.Code,
+            Id = model.Id,
+            Name = model.CustomerCompany?.Name,
+            FirstName = model.CustomerPerson?.FirstName,
+            LastName = model.CustomerPerson?.LastName,
+            MiddleName = model.CustomerPerson?.MiddleName,
+            Ssn = model.CustomerPerson?.Ssn,
             CreatedBy = model.CreatedBy,
             Created = model.Created,
             Updated = model.Updated,
             UpdatedBy = model.UpdatedBy,
-            CustomerId = model.Id,
             CustomerAddresses = model.CustomerAddresses?.Select(_ => MapToCustomerAddressDto(_)),
-            RowVersion = model.CustomerCompany.RowVersion,
-            CustomerRowVersion = model.RowVersion,
+            RowVersion = model.RowVersion,
             CustomerContactInfos = model.CustomerContactInfos?.Select(_ => MapToCustomerContactInfoDto(_)),
-        };      
-
-        private CustomerPersonDto MapToCustomerPersonDto(Customer model) 
-        => new() {
-            Active = model.Active,
-            FirstName = model.CustomerPerson!.FirstName,
-            Id = model.CustomerPerson.Id,
-            LastName = model.CustomerPerson.LastName,
-            MiddleName = model.CustomerPerson.MiddleName,
-            Ssn = model.CustomerPerson.Ssn,
-            CreatedBy = model.CreatedBy,
-            Created = model.Created,
-            Updated = model.Updated,
-            UpdatedBy = model.UpdatedBy,
-            CustomerId = model.Id,
-            CustomerAddresses = model.CustomerAddresses?.Select(_ => MapToCustomerAddressDto(_)),
-            RowVersion = model.CustomerPerson.RowVersion,
-            CustomerRowVersion = model.RowVersion,
-            CustomerContactInfos = model.CustomerContactInfos?.Select(_ => MapToCustomerContactInfoDto(_)),
+            IsCompany = model.CustomerCompany != null
         };
 
-        private CustomerAddressDto MapToCustomerAddressDto(CustomerAddress model)
+        private static CustomerAddressDto MapToCustomerAddressDto(CustomerAddress model)
         => new(
             model.Id,
             model.CustomerId,
@@ -120,9 +101,10 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>
             model.Created,
             model.Updated,
             model.RowVersion
-        );   
+        );
 
-        private CustomerContactInfoDto MapToCustomerContactInfoDto(CustomerContactInfo model) {
+        private static CustomerContactInfoDto MapToCustomerContactInfoDto(CustomerContactInfo model)
+        {
             var (value, prefix) = GetValueAndPrefix(model.Value, model.Type);
             return new(
                 model.Id,
@@ -134,12 +116,13 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerPersonDto>
             );
         }
 
-        private (string? Value, string? Prefix) GetValueAndPrefix(string? value, string? type) {
+        private static (string? Value, string? Prefix) GetValueAndPrefix(string? value, string? type)
+        {
             if (type == ContactInfoType.Email || type == ContactInfoType.Website)
                 return (value, null);
 
-            var prefix = value?.Substring(0, 3);
-            var number = value?.Substring(3);
+            var prefix = value?[..3];
+            var number = value?[3..];
             return (number, prefix);
         }
     }

@@ -1,7 +1,7 @@
-namespace AppLogic.Customers.CustomerContactInfos.Commands;
+namespace Customers.CustomerContactInfos.Commands;
 
 public class InsertCustomerContactInfoCommand : CustomerContactInfoModel, IRequest<OneOf<Success<SqlResult>, Error<string>, ValidationError>>
-{ 
+{
     public int? CustomerId { get; set; }
 
     public class InsertCustomerContactInfoValidator : AbstractValidator<InsertCustomerContactInfoCommand>
@@ -20,8 +20,8 @@ public class InsertCustomerContactInfoCommand : CustomerContactInfoModel, IReque
         private readonly IValidator<InsertCustomerContactInfoCommand> _validator;
 
         public InsertCustomerContactInfoHandler(
-            IUnitOfWork unitOfWork, 
-            IAuthenticationService authenticationService, 
+            IUnitOfWork unitOfWork,
+            IAuthenticationService authenticationService,
             IValidator<InsertCustomerContactInfoCommand> validator)
         {
             _unitOfWork = unitOfWork;
@@ -31,24 +31,24 @@ public class InsertCustomerContactInfoCommand : CustomerContactInfoModel, IReque
 
         public async Task<OneOf<Success<SqlResult>, Error<string>, ValidationError>> Handle(InsertCustomerContactInfoCommand request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
-                
+
             var username = _authenticationService.GetUserName();
 
             var info = MapModelToCustomerContactInfo(request, username);
-                   
+
             var res = await _unitOfWork.CustomerContactInfoRepository.InsertAsync(info);
             if (res == null)
                 return new Error<string>("Failed to insert customer contact info.");
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new Success<SqlResult>(res);
         }
 
-        private CustomerContactInfo MapModelToCustomerContactInfo(InsertCustomerContactInfoCommand model, string username)
+        private static CustomerContactInfo MapModelToCustomerContactInfo(InsertCustomerContactInfoCommand model, string username)
         => new()
         {
             Id = model.Id,
@@ -60,4 +60,3 @@ public class InsertCustomerContactInfoCommand : CustomerContactInfoModel, IReque
         };
     }
 }
-    

@@ -1,4 +1,4 @@
-namespace AppLogic.Customers.CustomerAddresses.Commands;
+namespace Customers.CustomerAddresses.Commands;
 
 public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf<Success<SqlResult>, Error<string>, ValidationError>>
 {
@@ -12,7 +12,7 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             RuleFor(_ => _).SetValidator(new CustomerAddressModelValidator());
         }
     }
-    
+
     public class InsertCustomerAddressHandler : IRequestHandler<InsertCustomerAddressCommand, OneOf<Success<SqlResult>, Error<string>, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -31,27 +31,27 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
 
         public async Task<OneOf<Success<SqlResult>, Error<string>, ValidationError>> Handle(InsertCustomerAddressCommand request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
-                
+
             var username = _authenticationService.GetUserName();
 
             var address = MapModelToCustomerAddress(request, username);
-            
+
             if (request.IsPrimary == true)
                 await _unitOfWork.CustomerAddressRepository.RemoveAllPrimaryAsync(request.CustomerId);
-            
+
             var res = await _unitOfWork.CustomerAddressRepository.InsertAsync(address);
             if (res == null)
                 return new Error<string>("Failed to insert customer address.");
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new Success<SqlResult>(res);
         }
 
-        private CustomerAddress MapModelToCustomerAddress(InsertCustomerAddressCommand model, string username)
+        private static CustomerAddress MapModelToCustomerAddress(InsertCustomerAddressCommand model, string username)
         => new()
         {
             Id = model.Id,
@@ -65,6 +65,6 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             CreatedBy = username,
             UpdatedBy = username,
             RowVersion = model.RowVersion
-        };        
+        };
     }
 }

@@ -1,13 +1,10 @@
-namespace Services.DatabaseDapper.Queries;
-
+namespace DatabaseDapper.Queries;
 
 public static class CustomerContactInfoQueries
 {
     public const string GetById = "SELECT * FROM CustomerContactInfo WHERE Id = @Id";
-
     public const string Delete = "DELETE FROM CustomerContactInfo WHERE Id = @Id";
-   
-    public const string Update = 
+    public const string Update =
     """
         UPDATE CustomerContactInfo 
         SET Type = @Type,
@@ -18,15 +15,13 @@ public static class CustomerContactInfoQueries
         OUTPUT INSERTED.[Id], INSERTED.RowVersion 
         WHERE Id = @Id
     """;
-
-    public const string Insert = 
+    public const string Insert =
     """
         INSERT INTO CustomerContactInfo (Type, Value, CustomerId, CreatedBy, UpdatedBy) 
         OUTPUT INSERTED.[Id], INSERTED.RowVersion
         VALUES (@Type, @Value, @CustomerId, @CreatedBy, @UpdatedBy);
     """;
-
-    public const string InsertMultiple = 
+    public const string InsertMultiple =
     """
         INSERT INTO CustomerContactInfo (Type, Value, CustomerId, CreatedBy, UpdatedBy)
         VALUES (@Type, @Value, @CustomerId, @CreatedBy, @UpdatedBy);

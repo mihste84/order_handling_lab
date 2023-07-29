@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace AppLogic.Common.Validators;
+namespace Common.Validators;
 
 public class DynamicSearchQueryValidator : AbstractValidator<DynamicSearchQuery>
 {

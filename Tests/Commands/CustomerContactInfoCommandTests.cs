@@ -1,70 +1,73 @@
-using AppLogic.Common.Services;
-using AppLogic.Customers.CustomerContactInfos.Commands;
+using Common.Services;
+using Customers.CustomerContactInfos.Commands;
 
 namespace Tests.Commands;
 
 public class CustomerContactInfoCommandTests
 {
     [Fact]
-    public async Task InsertCustomerContactInfoCommand_Pass() 
+    public async Task InsertCustomerContactInfoCommand()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
-               
-        var command = new InsertCustomerContactInfoCommand {
+
+        var command = new InsertCustomerContactInfoCommand
+        {
             Value = "+46704512343",
             Type = ContactInfoType.Phone,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-            CustomerId = 1
-        };
-        var handler = new InsertCustomerContactInfoCommand.InsertCustomerContactInfoHandler(
-            mockUnitOfWork.Object,             
-            new TestAuthenticationService(),
-            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()
-        );
-
-        var result = await handler.Handle(command, CancellationToken.None);
-        Assert.True(result.IsT0);
-        mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.AtLeastOnce());
-        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task InsertCustomerContactInfoCommand_IsPrimary_Pass() 
-    {
-        var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
-               
-        var command = new InsertCustomerContactInfoCommand {
-            Value = "+46704512343",
-            Type = ContactInfoType.Phone,
-            RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-            CustomerId = 1
-        };
-        var handler = new InsertCustomerContactInfoCommand.InsertCustomerContactInfoHandler(
-            mockUnitOfWork.Object,             
-            new TestAuthenticationService(),
-            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()
-        );
-
-        var result = await handler.Handle(command, CancellationToken.None);
-        Assert.True(result.IsT0);
-        mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.AtLeastOnce());
-        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task InsertCustomerContactInfoCommand_Invalid_Fail() 
-    {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
-               
-        var command = new InsertCustomerContactInfoCommand {           
             CustomerId = 1
         };
         var handler = new InsertCustomerContactInfoCommand.InsertCustomerContactInfoHandler(
             mockUnitOfWork.Object,
             new TestAuthenticationService(),
-            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()           
+            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()
+        );
+
+        var result = await handler.Handle(command, CancellationToken.None);
+        Assert.True(result.IsT0);
+        mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.AtLeastOnce());
+        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task InsertCustomerContactInfoCommand_IsPrimary()
+    {
+        var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
+
+        var command = new InsertCustomerContactInfoCommand
+        {
+            Value = "+46704512343",
+            Type = ContactInfoType.Phone,
+            RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+            CustomerId = 1
+        };
+        var handler = new InsertCustomerContactInfoCommand.InsertCustomerContactInfoHandler(
+            mockUnitOfWork.Object,
+            new TestAuthenticationService(),
+            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()
+        );
+
+        var result = await handler.Handle(command, CancellationToken.None);
+        Assert.True(result.IsT0);
+        mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.AtLeastOnce());
+        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task InsertCustomerContactInfoCommand_Invalid()
+    {
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+
+        var command = new InsertCustomerContactInfoCommand
+        {
+            CustomerId = 1
+        };
+        var handler = new InsertCustomerContactInfoCommand.InsertCustomerContactInfoHandler(
+            mockUnitOfWork.Object,
+            new TestAuthenticationService(),
+            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()
         );
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -77,12 +80,13 @@ public class CustomerContactInfoCommandTests
     }
 
     [Fact]
-    public async Task InsertCustomerContactInfoCommand_No_Insert_Fail() 
+    public async Task InsertCustomerContactInfoCommand_No_Insert()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() );
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
         mockUnitOfWork.Setup(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>())).ReturnsAsync((SqlResult?)null);
 
-        var command = new InsertCustomerContactInfoCommand {           
+        var command = new InsertCustomerContactInfoCommand
+        {
             Value = "+46704512343",
             Type = ContactInfoType.Phone,
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
@@ -91,7 +95,7 @@ public class CustomerContactInfoCommandTests
         var handler = new InsertCustomerContactInfoCommand.InsertCustomerContactInfoHandler(
             mockUnitOfWork.Object,
             new TestAuthenticationService(),
-            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()          
+            new InsertCustomerContactInfoCommand.InsertCustomerContactInfoValidator()
         );
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -101,12 +105,14 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>()), Times.Once);
     }
-    
+
     [Fact]
-    public async Task UpdateCustomerContactInfoCommand_Pass() {
+    public async Task UpdateCustomerContactInfoCommand()
+    {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
 
-        var command = new UpdateCustomerContactInfoCommand {           
+        var command = new UpdateCustomerContactInfoCommand
+        {
             Value = "+46704512343",
             Type = ContactInfoType.Phone,
             Id = 1,
@@ -125,13 +131,15 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.UpdateAsync(It.IsAny<CustomerContactInfo>()), Times.Once);
-    }     
+    }
 
     [Fact]
-    public async Task UpdateCustomerContactInfoCommand_Invalid_Fail() {
+    public async Task UpdateCustomerContactInfoCommand_Invalid()
+    {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
 
-        var command = new UpdateCustomerContactInfoCommand {           
+        var command = new UpdateCustomerContactInfoCommand
+        {
             RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
         };
         var handler = new UpdateCustomerContactInfoCommand.UpdateCustomerContactInfoHandler(
@@ -149,14 +157,16 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.UpdateAsync(It.IsAny<CustomerContactInfo>()), Times.Never);
-    } 
+    }
 
     [Fact]
-    public async Task UpdateCustomerContactInfoCommand_Not_Found_Fail() {
+    public async Task UpdateCustomerContactInfoCommand_Not_Found()
+    {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
         mockUnitOfWork.Setup(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((CustomerContactInfo?)null);
 
-        var command = new UpdateCustomerContactInfoCommand {           
+        var command = new UpdateCustomerContactInfoCommand
+        {
             Value = "+46704512343",
             Type = ContactInfoType.Phone,
             Id = 1,
@@ -175,13 +185,15 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.UpdateAsync(It.IsAny<CustomerContactInfo>()), Times.Never);
-    } 
+    }
 
     [Fact]
-    public async Task UpdateCustomerContactInfoCommand_Wrong_RowVersion_Fail() {
+    public async Task UpdateCustomerContactInfoCommand_Wrong_RowVersion()
+    {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
 
-        var command = new UpdateCustomerContactInfoCommand {           
+        var command = new UpdateCustomerContactInfoCommand
+        {
             Value = "+46704512343",
             Type = ContactInfoType.Phone,
             Id = 1,
@@ -201,17 +213,19 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>()), Times.Once);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.UpdateAsync(It.IsAny<CustomerContactInfo>()), Times.Never);
-    } 
+    }
 
     [Fact]
-    public async Task DeleteCustomerContactInfoCommand_Pass() {
+    public async Task DeleteCustomerContactInfoCommand()
+    {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
 
-        var command = new DeleteCustomerContactInfoCommand {           
+        var command = new DeleteCustomerContactInfoCommand
+        {
             Id = 1
         };
         var handler = new DeleteCustomerContactInfoCommand.DeleteCustomerContactInfoHandler(
-            mockUnitOfWork.Object, 
+            mockUnitOfWork.Object,
             new DeleteCustomerContactInfoCommand.DeleteCustomerContactInfoValidator()
         );
 
@@ -220,15 +234,16 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Once);
-    } 
+    }
 
     [Fact]
-    public async Task DeleteCustomerContactInfoCommand_Invalid_Fail() {
+    public async Task DeleteCustomerContactInfoCommand_Invalid()
+    {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
 
-        var command = new DeleteCustomerContactInfoCommand {};
+        var command = new DeleteCustomerContactInfoCommand();
         var handler = new DeleteCustomerContactInfoCommand.DeleteCustomerContactInfoHandler(
-            mockUnitOfWork.Object, 
+            mockUnitOfWork.Object,
             new DeleteCustomerContactInfoCommand.DeleteCustomerContactInfoValidator()
         );
 
@@ -239,17 +254,19 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.Never());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Never);
-    } 
+    }
 
     [Fact]
-    public async Task DeleteCustomerContactInfoCommand_Error_Fail() {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() { Delete = false});
+    public async Task DeleteCustomerContactInfoCommand_Error()
+    {
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() { Delete = false });
 
-        var command = new DeleteCustomerContactInfoCommand {          
+        var command = new DeleteCustomerContactInfoCommand
+        {
             Id = 2
         };
         var handler = new DeleteCustomerContactInfoCommand.DeleteCustomerContactInfoHandler(
-            mockUnitOfWork.Object, 
+            mockUnitOfWork.Object,
             new DeleteCustomerContactInfoCommand.DeleteCustomerContactInfoValidator()
         );
 
@@ -259,7 +276,7 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.VerifyGet(x => x.CustomerContactInfoRepository, Times.AtLeastOnce());
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Once);
-    } 
+    }
 
     private record RepoitoryReturnValues(
         int CustomerContactInfoId = 1,
@@ -269,7 +286,8 @@ public class CustomerContactInfoCommandTests
         bool Delete = true
     );
 
-    private Mock<IUnitOfWork> GetMockUnitOfWork(RepoitoryReturnValues returnValues) {
+    private static Mock<IUnitOfWork> GetMockUnitOfWork(RepoitoryReturnValues returnValues)
+    {
         var mockUnitOfWork = new Mock<IUnitOfWork>();
         var res = new SqlResult { Id = returnValues.CustomerContactInfoId };
         var mockCustomerContactInfoRepository = new Mock<ICustomerContactInfoRepository>();
@@ -284,12 +302,13 @@ public class CustomerContactInfoCommandTests
             .ReturnsAsync(res);
         mockCustomerContactInfoRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(new CustomerContactInfo() { 
-                Id = returnValues.CustomerContactInfoId, 
+            .ReturnsAsync(new CustomerContactInfo()
+            {
+                Id = returnValues.CustomerContactInfoId,
                 CustomerId = returnValues.CustomerId,
                 Type = ContactInfoType.Email,
                 Value = "stemih11@gmail.com",
-                RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } 
+                RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
             });
 
         mockUnitOfWork.SetupGet(x => x.CustomerContactInfoRepository).Returns(mockCustomerContactInfoRepository.Object);

@@ -1,4 +1,4 @@
-namespace AppLogic.Customers.CommonModels;
+namespace Customers.CommonModels;
 
 public class CustomerContactInfoModel
 {

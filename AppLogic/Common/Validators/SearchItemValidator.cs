@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace AppLogic.Common.Validators;
+namespace Common.Validators;
 
 public class SearchItemValidator : AbstractValidator<SearchItem>
 {
@@ -15,7 +15,7 @@ public class SearchItemValidator : AbstractValidator<SearchItem>
             .NotEmpty()
             .When(x => x.Operator != SearchOperators.IsNull && x.Operator != SearchOperators.IsNotNull)
             .WithName("Search Item Value")
-            .WithMessage(_ => $"Search field '{_.Name}' must have a value.");        
+            .WithMessage(_ => $"Search field '{_.Name}' must have a value.");
         RuleFor(x => x.Operator)
             .NotEmpty()
             .WithName("Search Item Operator");

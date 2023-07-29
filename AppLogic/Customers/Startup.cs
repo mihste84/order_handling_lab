@@ -1,7 +1,7 @@
-﻿using AppLogic.Customers.BaseCustomers.Commands;
+﻿using Customers.BaseCustomers.Commands;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AppLogic.Customers;
+namespace Customers;
 
 public static class Startup
 {

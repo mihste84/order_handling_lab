@@ -1,5 +1,5 @@
-using AppLogic.Customers.BaseCustomers.Commands;
-using AppLogic.Customers.BaseCustomers.Queries;
+using Customers.BaseCustomers.Commands;
+using Customers.BaseCustomers.Queries;
 
 namespace App.Controllers;
 public class CustomerController : BaseController
@@ -20,9 +20,7 @@ public class CustomerController : BaseController
     {
         var result = await Mediator.Send(model);
         return result.Match<IActionResult>(
-            successPerson => Ok(successPerson.Value),
-            successCompany => Ok(successCompany.Value),
-            error => StatusCode(500, new { Message = error.Value } ),
+            success => Ok(success.Value),
             notFound => NoContent(),
             validationError => BadRequest(validationError)
         );
@@ -30,14 +28,14 @@ public class CustomerController : BaseController
 
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] InsertCustomerCommand model)
-    {        
+    {
         var result = await Mediator.Send(model);
         return result.Match<IActionResult>(
             success => Ok(success.Value),
-            error => StatusCode(500, new { Message = error.Value } ),
+            error => StatusCode(500, new { Message = error.Value }),
             validationError => BadRequest(validationError)
         );
-    }    
+    }
 
     [HttpPatch("{id}")]
     public async Task<IActionResult> Patch(int? id, [FromBody] UpdateCustomerCommand model)
@@ -47,7 +45,7 @@ public class CustomerController : BaseController
         return result.Match<IActionResult>(
             success => Ok(success.Value),
             notFound => NoContent(),
-            error => StatusCode(500, new { Message = error.Value } ),
+            error => StatusCode(500, new { Message = error.Value }),
             validationError => BadRequest(validationError)
         );
     }
@@ -58,7 +56,7 @@ public class CustomerController : BaseController
         var result = await Mediator.Send(new DeleteCustomerCommand { Id = id });
         return result.Match<IActionResult>(
             success => Ok(),
-            error => StatusCode(500, new { Message = error.Value } ),
+            error => StatusCode(500, new { Message = error.Value }),
             validationError => BadRequest(validationError)
         );
     }
