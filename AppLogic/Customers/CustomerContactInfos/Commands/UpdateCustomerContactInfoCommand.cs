@@ -1,7 +1,7 @@
-namespace AppLogic.Customers.CustomerContactInfos.Commands;
+namespace Customers.CustomerContactInfos.Commands;
 
 public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IRequest<OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>>
-{ 
+{
     public class UpdateCustomerContactInfoValidator : AbstractValidator<UpdateCustomerContactInfoCommand>
     {
         public UpdateCustomerContactInfoValidator()
@@ -33,10 +33,10 @@ public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IReque
 
         public async Task<OneOf<Success<SqlResult>, NotFound, Error<string>, ValidationError>> Handle(UpdateCustomerContactInfoCommand request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
-                
+
             var username = _authenticationService.GetUserName();
 
             var info = await _unitOfWork.CustomerContactInfoRepository.GetByIdAsync(request.Id!.Value);
@@ -44,7 +44,7 @@ public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IReque
                 return new NotFound();
             if (!info.RowVersion!.SequenceEqual(request.RowVersion!))
                 return new Error<string>("Customer contact info has been updated by another user. Please refresh the page and try again.");
-            
+
             info.Type = request.Type;
             info.Value = request.Value;
             info.UpdatedBy = username;
@@ -54,7 +54,7 @@ public class UpdateCustomerContactInfoCommand : CustomerContactInfoModel, IReque
             if (res == null)
                 return new Error<string>("Failed to update customer info.");
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new Success<SqlResult>(res);
         }

@@ -1,4 +1,4 @@
-namespace AppLogic.Customers.CommonValidators;
+namespace Customers.CommonValidators;
 
 public class CustomerAddressModelValidator : AbstractValidator<CustomerAddressModel>
 {

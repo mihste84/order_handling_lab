@@ -1,5 +1,4 @@
-namespace AppLogic.Common.Interfaces;
-
+namespace Common.Interfaces;
 
 public interface IAuthenticationService
 {

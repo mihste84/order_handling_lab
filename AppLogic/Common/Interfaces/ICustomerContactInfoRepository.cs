@@ -1,8 +1,10 @@
-namespace AppLogic.Common.Interfaces;
+namespace Common.Interfaces;
 
-
-public interface ICustomerContactInfoRepository : IBaseRepository<CustomerContactInfo>
+public interface ICustomerContactInfoRepository
 {
     public Task<bool> InsertMultipleAsync(IEnumerable<CustomerContactInfo> contactInfo);
-    Task<IEnumerable<CustomerContactInfo>> GetByCustomerIdAsync(int? customerId );
+    Task<CustomerContactInfo?> GetByIdAsync(int id);
+    Task<SqlResult?> InsertAsync(CustomerContactInfo entity);
+    Task<bool> DeleteByIdAsync(int id);
+    Task<SqlResult> UpdateAsync(CustomerContactInfo entity);
 }

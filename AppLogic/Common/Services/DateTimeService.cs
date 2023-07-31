@@ -1,6 +1,5 @@
 
-namespace AppLogic.Common.Services;
-
+namespace Common.Services;
 
 public class DateTimeService : IDateTimeService
 {

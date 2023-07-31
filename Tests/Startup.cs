@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
-using AppLogic.Common;
-using AppLogic.Customers;
+using Customers;
+using Common;
 
 namespace Tests;
 
-public class Startup
+public static class Startup
 {
-    public void ConfigureServices(IServiceCollection services)
+    public static void ConfigureServices(IServiceCollection services)
     {
         services.AddCommonServices();
         services.AddCustomerServices();

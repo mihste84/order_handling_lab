@@ -5,16 +5,7 @@ CREATE TABLE [dbo].[CustomerPersons](
 	[LastName] [nvarchar](50) NOT NULL,
 	[Ssn] [nvarchar](20) NOT NULL,
 	[CustomerId] [int] NOT NULL,
-	[CreatedBy] [nvarchar](200) NOT NULL,
-	[Created] [datetime2](7) NOT NULL,
-	[UpdatedBy] [nvarchar](200) NOT NULL,
-	[Updated] [datetime2](7) NOT NULL,
-	[RowVersion] [rowversion] NOT NULL
 )
-GO
-ALTER TABLE [dbo].[CustomerPersons] ADD CONSTRAINT DF_CustomerPersons_Created DEFAULT GETUTCDATE() FOR [Created];
-GO
-ALTER TABLE [dbo].[CustomerPersons] ADD CONSTRAINT DF_CustomerPersons_Updated DEFAULT GETUTCDATE() FOR [Updated];
 GO
 ALTER TABLE [dbo].[CustomerPersons] ADD  CONSTRAINT [PK_CustomerPersons] PRIMARY KEY CLUSTERED 
 (

@@ -1,4 +1,4 @@
-namespace AppLogic.Customers.CustomerAddresses.Commands;
+namespace Customers.CustomerAddresses.Commands;
 
 public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf<Success<SqlResult>, Error<string>, NotFound, ValidationError>>
 {
@@ -14,7 +14,7 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             RuleFor(_ => _).SetValidator(new CustomerAddressModelValidator());
         }
     }
-    
+
     public class UpdateCustomerAddressHandler : IRequestHandler<UpdateCustomerAddressCommand, OneOf<Success<SqlResult>, Error<string>, NotFound, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -23,9 +23,9 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
         private readonly IDateTimeService _dateTimeService;
 
         public UpdateCustomerAddressHandler(
-            IUnitOfWork unitOfWork, 
-            IAuthenticationService authenticationService, 
-            IValidator<UpdateCustomerAddressCommand> validator, 
+            IUnitOfWork unitOfWork,
+            IAuthenticationService authenticationService,
+            IValidator<UpdateCustomerAddressCommand> validator,
             IDateTimeService dateTimeService)
         {
             _unitOfWork = unitOfWork;
@@ -36,13 +36,13 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
 
         public async Task<OneOf<Success<SqlResult>, Error<string>, NotFound, ValidationError>> Handle(UpdateCustomerAddressCommand request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
-                
+
             var username = _authenticationService.GetUserName();
 
-            var address = await _unitOfWork.CustomerAddressesRepository.GetByIdAsync(request.Id!.Value);
+            var address = await _unitOfWork.CustomerAddressRepository.GetByIdAsync(request.Id!.Value);
             if (address == null)
                 return new NotFound();
             if (!address.RowVersion!.SequenceEqual(request.RowVersion!))
@@ -58,13 +58,13 @@ public class UpdateCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             address.Updated = _dateTimeService.GetUtc();
 
             if (request.IsPrimary == true)
-                await _unitOfWork.CustomerAddressesRepository.RemoveAllPrimaryAsync(request.CustomerId!.Value);
-            
-            var res = await _unitOfWork.CustomerAddressesRepository.UpdateAsync(address);
+                await _unitOfWork.CustomerAddressRepository.RemoveAllPrimaryAsync(request.CustomerId!.Value);
+
+            var res = await _unitOfWork.CustomerAddressRepository.UpdateAsync(address);
             if (res == null)
                 return new Error<string>("Failed to update customer address.");
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new Success<SqlResult>(res);
         }

@@ -1,4 +1,4 @@
-namespace AppLogic.Customers.CustomerContactInfos.Commands;
+namespace Customers.CustomerContactInfos.Commands;
 
 public class DeleteCustomerContactInfoCommand : IRequest<OneOf<Success, Error<string>, ValidationError>>
 {
@@ -18,7 +18,7 @@ public class DeleteCustomerContactInfoCommand : IRequest<OneOf<Success, Error<st
         private readonly IValidator<DeleteCustomerContactInfoCommand> _validator;
 
         public DeleteCustomerContactInfoHandler(
-            IUnitOfWork unitOfWork, 
+            IUnitOfWork unitOfWork,
             IValidator<DeleteCustomerContactInfoCommand> validator)
         {
             _unitOfWork = unitOfWork;
@@ -27,7 +27,7 @@ public class DeleteCustomerContactInfoCommand : IRequest<OneOf<Success, Error<st
 
         public async Task<OneOf<Success, Error<string>, ValidationError>> Handle(DeleteCustomerContactInfoCommand request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
 
@@ -35,8 +35,8 @@ public class DeleteCustomerContactInfoCommand : IRequest<OneOf<Success, Error<st
             if (!success)
                 return new Error<string>("Failed to delete customer contact info.");
 
-            await _unitOfWork.SaveChangesAsync();
-            
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             return new Success();
         }
     }

@@ -1,8 +1,8 @@
-global using AppLogic.Common.Interfaces;
-global using AppLogic.Common.Mediatr;
-global using AppLogic.Common.Services;
+global using Common.Interfaces;
+global using Common.Mediatr;
+global using Common.Services;
 global using MediatR;
 global using Models.Values;
 global using Models.Entities;
 global using Models.Dtos;
-global using AppLogic.Common.Models;
+global using Common.Models;

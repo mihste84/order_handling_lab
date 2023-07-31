@@ -1,11 +1,11 @@
-global using AppLogic.Common.Interfaces;
+global using Common.Interfaces;
 global using MediatR;
 global using FluentValidation;
 global using Models.Entities;
 global using Models.Dtos;
-global using AppLogic.Customers.CommonModels;
-global using AppLogic.Customers.CommonValidators;
+global using Customers.CommonModels;
+global using Customers.CommonValidators;
 global using OneOf;
 global using OneOf.Types;
-global using AppLogic.Common.Models;
+global using Common.Models;
 global using Models.Values;

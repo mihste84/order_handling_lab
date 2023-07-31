@@ -1,4 +1,4 @@
-namespace AppLogic.Customers.CustomerAddresses.Commands;
+namespace Customers.CustomerAddresses.Commands;
 
 public class DeleteCustomerAddressCommand : IRequest<OneOf<Success, Error<string>, ValidationError>>
 {
@@ -18,7 +18,7 @@ public class DeleteCustomerAddressCommand : IRequest<OneOf<Success, Error<string
         private readonly IValidator<DeleteCustomerAddressCommand> _validator;
 
         public DeleteCustomerAddressHandler(
-            IUnitOfWork unitOfWork, 
+            IUnitOfWork unitOfWork,
             IValidator<DeleteCustomerAddressCommand> validator)
         {
             _unitOfWork = unitOfWork;
@@ -27,16 +27,16 @@ public class DeleteCustomerAddressCommand : IRequest<OneOf<Success, Error<string
 
         public async Task<OneOf<Success, Error<string>, ValidationError>> Handle(DeleteCustomerAddressCommand request, CancellationToken cancellationToken)
         {
-            var result = await _validator.ValidateAsync(request);
+            var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
 
-            var success = await _unitOfWork.CustomerAddressesRepository.DeleteByIdAsync(request.Id!.Value);
+            var success = await _unitOfWork.CustomerAddressRepository.DeleteByIdAsync(request.Id!.Value);
             if (!success)
                 return new Error<string>("Failed to delete customer address.");
 
-            await _unitOfWork.SaveChangesAsync();
-            
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             return new Success();
         }
     }
