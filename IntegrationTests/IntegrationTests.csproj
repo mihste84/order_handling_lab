@@ -10,10 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-    <PackageReference Include="Moq" Version="4.18.4" />
-    <PackageReference Include="xunit" Version="2.5.0" />
+      <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="Xunit.DependencyInjection" Version="8.7.2" />
     <PackageReference Include="Xunit.Extensions.Ordering" Version="1.4.5" />
+    <PackageReference Include="xunit" Version="2.5.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -22,10 +22,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.9" />
+    <PackageReference Include="Respawn" Version="6.1.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Services\DatabaseDapper\DatabaseDapper.csproj" />
-    <ProjectReference Include="..\AppLogic\Customers\Customers.csproj" />
-    <ProjectReference Include="..\AppLogic\MasterData\MasterData.csproj" />
+    <ProjectReference Include="..\App\App.csproj" />
   </ItemGroup>
 </Project>

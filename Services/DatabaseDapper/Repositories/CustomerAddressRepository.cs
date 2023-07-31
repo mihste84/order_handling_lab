@@ -33,7 +33,7 @@ public class CustomerAddressRepository : ICustomerAddressRepository
 
     public async Task<(IEnumerable<City> Cities, IEnumerable<Country> Countries)> GetAllReferenceDataAsync()
     {
-        var mapper = await _transaction.Connection.QueryMultipleAsync(CustomerAddressQueries.GetAllReferenceDataAsync, _transaction);
+        var mapper = await _transaction.Connection.QueryMultipleAsync(CustomerAddressQueries.GetAllReferenceDataAsync, transaction: _transaction);
 
         return (
             await mapper.ReadAsync<City>(),

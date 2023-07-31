@@ -37,10 +37,9 @@ public class CustomerController : BaseController
         );
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> Patch(int? id, [FromBody] UpdateCustomerCommand model)
+    [HttpPut]
+    public async Task<IActionResult> Patch([FromBody] UpdateCustomerCommand model)
     {
-        model.Id = id;
         var result = await Mediator.Send(model);
         return result.Match<IActionResult>(
             success => Ok(success.Value),

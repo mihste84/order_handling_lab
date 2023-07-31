@@ -149,6 +149,10 @@ public class CustomerRepository : ICustomerRepository
         {
             parameters.Add("Code", entity.CustomerCompany!.Code);
             parameters.Add("Name", entity.CustomerCompany!.Name);
+            parameters.Add("FirstName", null);
+            parameters.Add("LastName", null);
+            parameters.Add("MiddleName", null);
+            parameters.Add("Ssn", null);
         }
         else
         {
@@ -156,6 +160,8 @@ public class CustomerRepository : ICustomerRepository
             parameters.Add("LastName", entity.CustomerPerson!.LastName);
             parameters.Add("MiddleName", entity.CustomerPerson!.MiddleName);
             parameters.Add("Ssn", entity.CustomerPerson!.Ssn);
+            parameters.Add("Code", null);
+            parameters.Add("Name", null);
         }
 
         try
@@ -180,14 +186,20 @@ public class CustomerRepository : ICustomerRepository
     {
         var parameters = new DynamicParameters();
         var IsCompany = entity.CustomerCompany != null;
+        parameters.Add("Id", entity.Id);
         parameters.Add("Active", entity.Active);
         parameters.Add("CreatedBy", entity.CreatedBy);
         parameters.Add("UpdatedBy", entity.UpdatedBy);
+        parameters.Add("Updated", entity.Updated);
         parameters.Add("IsCompany", IsCompany ? 1 : 0);
         if (IsCompany)
         {
             parameters.Add("Code", entity.CustomerCompany!.Code);
             parameters.Add("Name", entity.CustomerCompany!.Name);
+            parameters.Add("FirstName", null);
+            parameters.Add("LastName", null);
+            parameters.Add("MiddleName", null);
+            parameters.Add("Ssn", null);
         }
         else
         {
@@ -195,6 +207,8 @@ public class CustomerRepository : ICustomerRepository
             parameters.Add("LastName", entity.CustomerPerson!.LastName);
             parameters.Add("MiddleName", entity.CustomerPerson!.MiddleName);
             parameters.Add("Ssn", entity.CustomerPerson!.Ssn);
+            parameters.Add("Code", null);
+            parameters.Add("Name", null);
         }
 
         return await _transaction.Connection.QuerySingleAsync<SqlResult>(

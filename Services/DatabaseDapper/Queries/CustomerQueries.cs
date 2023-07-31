@@ -82,17 +82,17 @@ public static class CustomerQueries
 
     public const string Update =
     """
-        IF @IsCompany = 1 
+        IF (@IsCompany = 1) 
             UPDATE CustomerCompanies
             SET Name = @Name,
-                Code = @Code,
+                Code = @Code
             WHERE CustomerId = @Id
         ELSE 
             UPDATE CustomerPersons
             SET FirstName = @FirstName,
                 LastName = @LastName,
                 MiddleName = @MiddleName,
-                Ssn = @Ssn,
+                Ssn = @Ssn
             WHERE CustomerId = @Id
 
         UPDATE Customers 
@@ -112,10 +112,10 @@ public static class CustomerQueries
         VALUES (@Active, @CreatedBy, @UpdatedBy);
 
         IF (@IsCompany = 1)
-            INSERT INTO CustomerCompanies (CustomerId, Name, Code, CreatedBy, UpdatedBy) 
-            SELECT Id, @Code, @Name FROM @customerIds;
+            INSERT INTO CustomerCompanies (CustomerId, Name, Code) 
+            SELECT Id, @Name, @Code FROM @customerIds;
         ELSE
-            INSERT INTO CustomerPersons (CustomerId, FirstName, LastName, MiddleName, Ssn, CreatedBy, UpdatedBy) 
+            INSERT INTO CustomerPersons (CustomerId, FirstName, LastName, MiddleName, Ssn) 
             SELECT Id, @FirstName, @LastName, @MiddleName, @Ssn FROM @customerIds;
 
         SELECT * FROM @customerIds;

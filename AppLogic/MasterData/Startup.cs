@@ -7,6 +7,6 @@ public static class Startup
 {
     public static void AddMasterDataServices(this IServiceCollection services)
     {
-        services.AddMediatR(typeof(SelectAllMasterDataQuery).Assembly);
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<SelectAllMasterDataQuery>());
     }
 }

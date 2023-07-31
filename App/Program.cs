@@ -13,15 +13,24 @@ builder.Services.AddCommonServices();
 builder.Services.AddCustomerServices();
 builder.Services.AddMasterDataServices();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddCors();
 
-builder.Services.AddAuthentication(options =>
+if (builder.Environment.IsEnvironment("IntegrationTests"))
 {
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-}).AddMicrosoftIdentityWebApp(builder.Configuration);
+    builder.Services.AddScoped<IAuthenticationService, TestAuthenticationService>();
+    builder.Services.AddSingleton<IAuthorizationHandler, AllowAnonymous>();
+}
+else
+{
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    }).AddMicrosoftIdentityWebApp(builder.Configuration);
+
+    builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+    builder.Services.AddCors();
+}
 
 builder.Services.Configure<CookieAuthenticationOptions>(o => o.LoginPath = PathString.Empty);
 
@@ -48,3 +57,5 @@ app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();
+
+public partial class Program { }
