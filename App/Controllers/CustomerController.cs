@@ -21,7 +21,7 @@ public class CustomerController : BaseController
         var result = await Mediator.Send(model);
         return result.Match<IActionResult>(
             success => Ok(success.Value),
-            notFound => NoContent(),
+            notFound => NotFound(),
             validationError => BadRequest(validationError)
         );
     }
@@ -43,7 +43,7 @@ public class CustomerController : BaseController
         var result = await Mediator.Send(model);
         return result.Match<IActionResult>(
             success => Ok(success.Value),
-            notFound => NoContent(),
+            notFound => NotFound(),
             error => StatusCode(500, new { Message = error.Value }),
             validationError => BadRequest(validationError)
         );

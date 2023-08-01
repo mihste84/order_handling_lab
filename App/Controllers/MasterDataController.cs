@@ -8,6 +8,9 @@ public class MasterDataController : BaseController
     public async Task<IActionResult> Get()
     {
         var result = await Mediator.Send(new SelectAllMasterDataQuery());
-        return result.Match<IActionResult>(success => Ok(success.Value));
+        return result.Match<IActionResult>(
+            success => Ok(success.Value),
+            _ => NotFound()
+        );
     }
 }

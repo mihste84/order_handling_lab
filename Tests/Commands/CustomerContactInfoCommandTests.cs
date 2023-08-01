@@ -8,7 +8,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task InsertCustomerContactInfoCommand()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
 
         var command = new InsertCustomerContactInfoCommand
         {
@@ -33,7 +33,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task InsertCustomerContactInfoCommand_IsPrimary()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
 
         var command = new InsertCustomerContactInfoCommand
         {
@@ -58,7 +58,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task InsertCustomerContactInfoCommand_Invalid()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 
         var command = new InsertCustomerContactInfoCommand
         {
@@ -82,7 +82,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task InsertCustomerContactInfoCommand_No_Insert()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
         mockUnitOfWork.Setup(x => x.CustomerContactInfoRepository.InsertAsync(It.IsAny<CustomerContactInfo>())).ReturnsAsync((SqlResult?)null);
 
         var command = new InsertCustomerContactInfoCommand
@@ -109,7 +109,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task UpdateCustomerContactInfoCommand()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 
         var command = new UpdateCustomerContactInfoCommand
         {
@@ -136,7 +136,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task UpdateCustomerContactInfoCommand_Invalid()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 
         var command = new UpdateCustomerContactInfoCommand
         {
@@ -162,7 +162,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task UpdateCustomerContactInfoCommand_Not_Found()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
         mockUnitOfWork.Setup(x => x.CustomerContactInfoRepository.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((CustomerContactInfo?)null);
 
         var command = new UpdateCustomerContactInfoCommand
@@ -190,7 +190,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task UpdateCustomerContactInfoCommand_Wrong_RowVersion()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 
         var command = new UpdateCustomerContactInfoCommand
         {
@@ -218,7 +218,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task DeleteCustomerContactInfoCommand()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 
         var command = new DeleteCustomerContactInfoCommand
         {
@@ -239,7 +239,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task DeleteCustomerContactInfoCommand_Invalid()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues());
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 
         var command = new DeleteCustomerContactInfoCommand();
         var handler = new DeleteCustomerContactInfoCommand.DeleteCustomerContactInfoHandler(
@@ -259,7 +259,7 @@ public class CustomerContactInfoCommandTests
     [Fact]
     public async Task DeleteCustomerContactInfoCommand_Error()
     {
-        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepoitoryReturnValues() { Delete = false });
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues() { Delete = false });
 
         var command = new DeleteCustomerContactInfoCommand
         {
@@ -278,7 +278,7 @@ public class CustomerContactInfoCommandTests
         mockUnitOfWork.Verify(x => x.CustomerContactInfoRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Once);
     }
 
-    private record RepoitoryReturnValues(
+    private record RepositoryReturnValues(
         int CustomerContactInfoId = 1,
         int CustomerId = 1,
         bool CustomerContactInfo = true,
@@ -286,7 +286,7 @@ public class CustomerContactInfoCommandTests
         bool Delete = true
     );
 
-    private static Mock<IUnitOfWork> GetMockUnitOfWork(RepoitoryReturnValues returnValues)
+    private static Mock<IUnitOfWork> GetMockUnitOfWork(RepositoryReturnValues returnValues)
     {
         var mockUnitOfWork = new Mock<IUnitOfWork>();
         var res = new SqlResult { Id = returnValues.CustomerContactInfoId };

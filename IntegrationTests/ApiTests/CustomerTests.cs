@@ -1,5 +1,6 @@
 using Customers.BaseCustomers.Commands;
 using Customers.CommonModels;
+using Customers.Constants;
 
 namespace IntegrationTests.ApiTests;
 
@@ -172,6 +173,62 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         Assert.Null(customer);
     }
 
+
+    [Fact]
+    public async Task Get_Customer_By_Ssn()
+    {
+        await _testBase.ResetDbAsync();
+        var insertCommand = GetBaseInsertCustomerPersonCommand();
+        var response = await InsertCustomerAsync(insertCommand);
+
+        var res = await _testBase.HttpClient.GetFromJsonAsync<CustomerDto>($"/api/customer?value={response!.Id}&type={CustomerSearchValues.Id}");
+
+        Assert.NotNull(res);
+        Assert.Equal(response.Id, res!.Id);
+        Assert.Equal(insertCommand.FirstName, res.FirstName);
+        Assert.Equal(insertCommand.LastName, res.LastName);
+        Assert.Equal(insertCommand.MiddleName, res.MiddleName);
+        Assert.Equal(insertCommand.Ssn, res.Ssn);
+        Assert.NotEmpty(res.CustomerAddresses!);
+        Assert.NotEmpty(res.CustomerContactInfos!);
+    }
+
+    [Fact]
+    public async Task Get_Customer_By_Code()
+    {
+        await _testBase.ResetDbAsync();
+        var insertCommand = GetBaseInsertCustomerCompanyCommand();
+        var response = await InsertCustomerAsync(insertCommand);
+
+        var res = await _testBase.HttpClient.GetFromJsonAsync<CustomerDto>($"/api/customer?value={response!.Id}&type={CustomerSearchValues.Id}");
+
+        Assert.NotNull(res);
+        Assert.Equal(response.Id, res!.Id);
+        Assert.Equal(insertCommand.Code, res.Code);
+        Assert.Equal(insertCommand.Name, res.Name);
+        Assert.NotEmpty(res.CustomerAddresses!);
+        Assert.NotEmpty(res.CustomerContactInfos!);
+    }
+
+    [Fact]
+    public async Task Get_Customer_By_Id()
+    {
+        await _testBase.ResetDbAsync();
+        var insertCommand = GetBaseInsertCustomerPersonCommand();
+        var response = await InsertCustomerAsync(insertCommand);
+
+        var res = await _testBase.HttpClient.GetFromJsonAsync<CustomerDto>($"/api/customer?value={response!.Id}&type={CustomerSearchValues.Id}");
+
+        Assert.NotNull(res);
+        Assert.Equal(response.Id, res!.Id);
+        Assert.Equal(insertCommand.FirstName, res.FirstName);
+        Assert.Equal(insertCommand.LastName, res.LastName);
+        Assert.Equal(insertCommand.MiddleName, res.MiddleName);
+        Assert.Equal(insertCommand.Ssn, res.Ssn);
+        Assert.NotEmpty(res.CustomerAddresses!);
+        Assert.NotEmpty(res.CustomerContactInfos!);
+    }
+
     private async Task<SqlResult?> InsertCustomerAsync(InsertCustomerCommand model)
     {
         var res = await _testBase.HttpClient.PostAsJsonAsync("/api/customer", model);
@@ -184,6 +241,121 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         var res = await _testBase.HttpClient.PutAsJsonAsync("/api/customer", model);
         res.EnsureSuccessStatusCode();
         return await res.Content.ReadFromJsonAsync<SqlResult>();
+    }
+
+    private async Task InsertSearchTestCustomersAsync()
+    {
+        var customers = new[] {
+            new InsertCustomerCommand()
+            {
+                Name = "Company 1",
+                Code = "123456789",
+                IsCompany = true,
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "123 Main St",
+                        CityId = 1,
+                        CountryId = 1,
+                        IsPrimary = true,
+                        PostArea = "Stockholm",
+                        ZipCode = "12345"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "company1@mail.com"
+                    },
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Phone,
+                        Value = "+46701234567"
+                    }
+                }
+            },
+            new InsertCustomerCommand()
+            {
+                Name = "Company 2",
+                Code = "987654321",
+                IsCompany = true,
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "987 Main St",
+                        CityId = 2,
+                        CountryId = 2,
+                        IsPrimary = true,
+                        PostArea = "Solna",
+                        ZipCode = "54321"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "company2@mail.com"
+                    },
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Phone,
+                        Value = "+46987654321"
+                    }
+                }
+            },
+            new InsertCustomerCommand()
+            {
+                FirstName = "Stefan",
+                LastName = "Larsson",
+                Ssn = "12345678-1234",
+                IsCompany = false,
+                MiddleName = "Lars",
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "654 Main St",
+                        CityId = 1,
+                        CountryId = 1,
+                        IsPrimary = true,
+                        PostArea = "Solna",
+                        ZipCode = "54321"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "stefan.larsson@mail.com"
+                    }
+                }
+            },
+            new InsertCustomerCommand()
+            {
+                FirstName = "Lars",
+                LastName = "Nilsson",
+                Ssn = "87654321-1234",
+                IsCompany = false,
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "XYZ St",
+                        CityId = 3,
+                        CountryId = 3,
+                        IsPrimary = true,
+                        PostArea = "ABC",
+                        ZipCode = "78945"
+                    },
+                    new CustomerAddressModel {
+                        Address = "ABC St",
+                        CityId = 1,
+                        CountryId = 1,
+                        IsPrimary = false,
+                        PostArea = "CBA",
+                        ZipCode = "56431"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "Lars.Nilsson@mail.com"
+                    }
+                }
+            },
+        };
+
+        await Parallel.ForEachAsync(customers, async (command, _) => await InsertCustomerAsync(command));
     }
 
     private static InsertCustomerCommand GetBaseInsertCustomerCompanyCommand()

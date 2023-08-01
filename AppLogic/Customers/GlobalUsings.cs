@@ -9,3 +9,4 @@ global using OneOf;
 global using OneOf.Types;
 global using Common.Models;
 global using Models.Values;
+global using Customers.Constants;

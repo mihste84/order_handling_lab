@@ -7,14 +7,18 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerDto>, NotF
     public string? Type { get; set; }
     public string? Value { get; set; }
 
-    public class GetCustomerPersonBySsnValidator : AbstractValidator<GetCustomerByValueQuery>
+    public class GetCustomerByValueValidator : AbstractValidator<GetCustomerByValueQuery>
     {
-        public GetCustomerPersonBySsnValidator()
+        public GetCustomerByValueValidator()
         {
             RuleFor(x => x.Type)
                 .NotEmpty()
                 .MaximumLength(20)
-                .Must(type => type == "ssn" || type == "code" || type == "id")
+                .Must(type =>
+                    type == CustomerSearchValues.Ssn ||
+                    type == CustomerSearchValues.Code ||
+                    type == CustomerSearchValues.Id
+                )
                 .WithName("Customer Type");
             RuleFor(x => x.Value)
                 .MaximumLength(20)
@@ -29,12 +33,12 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerDto>, NotF
         }
     }
 
-    public class GetCustomerPersonBySsnHandler : IRequestHandler<GetCustomerByValueQuery, OneOf<Success<CustomerDto>, NotFound, ValidationError>>
+    public class GetCustomerByValueHandler : IRequestHandler<GetCustomerByValueQuery, OneOf<Success<CustomerDto>, NotFound, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<GetCustomerByValueQuery> _validator;
 
-        public GetCustomerPersonBySsnHandler(IUnitOfWork unitOfWork, IValidator<GetCustomerByValueQuery> validator)
+        public GetCustomerByValueHandler(IUnitOfWork unitOfWork, IValidator<GetCustomerByValueQuery> validator)
         {
             _unitOfWork = unitOfWork;
             _validator = validator;
@@ -59,9 +63,9 @@ public class GetCustomerByValueQuery : IRequest<OneOf<Success<CustomerDto>, NotF
         private async Task<Customer?> GetCustomerAsync(string type, string value)
         => type switch
         {
-            "ssn" => await _unitOfWork.CustomerRepository.GetBySsnAsync(value),
-            "code" => await _unitOfWork.CustomerRepository.GetByCodeAsync(value),
-            "id" => await _unitOfWork.CustomerRepository.GetByIdAsync(int.Parse(value)),
+            CustomerSearchValues.Ssn => await _unitOfWork.CustomerRepository.GetBySsnAsync(value),
+            CustomerSearchValues.Code => await _unitOfWork.CustomerRepository.GetByCodeAsync(value),
+            CustomerSearchValues.Id => await _unitOfWork.CustomerRepository.GetByIdAsync(int.Parse(value)),
             _ => throw new ArgumentException("Invalid customer type", nameof(type))
         };
 
