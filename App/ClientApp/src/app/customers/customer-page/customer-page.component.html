@@ -1,0 +1,55 @@
+<app-modal #createNewCustomerModal title="Add new customer">
+  <section class="w-96" *ngIf="createNewCustomerModal.isModalVisible()">
+    <app-new-customer-form (onAddNewCustomer)="onAddNewCustomerCallback($event, createNewCustomerModal)" />
+  </section>
+</app-modal>
+
+<app-modal #sharedModal></app-modal>
+
+<div class="p-2 flex flex-col h-full">
+  <section class="flex flex-row items-start mb-3 flex-wrap">
+    <details class="flex-auto">
+      <summary class="cursor-pointer whitespace-nowrap">
+        Search filters (
+        <b>{{ searchModel.selectedSearchItemCount() }}</b>
+        )
+      </summary>
+      <app-dynamic-search [searchItems]="searchModel.searchItems"></app-dynamic-search>
+    </details>
+    <div>
+      <button
+        class="border rounded-md px-2 py-1 bg-gray-500 text-white me-2 whitespace-nowrap"
+        (click)="createNewCustomerModal.showModal()"
+      >
+        Add new <fa-icon class="ms-1" [icon]="faPlus" />
+      </button>
+      <button class="border rounded-md px-2 py-1 bg-blue-500 text-white" (click)="search(1)">Search</button>
+    </div>
+  </section>
+  <section class="flex-auto">
+    <div class="overflow-auto h-full styled-scrollbars">
+      <app-customer-table
+        (onSort)="onSortCallback($event)"
+        [currentSortColumnName]="searchModel.orderBy"
+        [currentSortDirection]="searchModel.orderDirection"
+        [customers]="customers"
+        (onDeleteCustomer)="onDeleteCustomerCallback($event)"
+      />
+    </div>
+  </section>
+  <section class="pt-2 flex items-center">
+    <app-table-pagination
+      [itemsPerPage]="searchModel.itemsPerPage"
+      [page]="searchModel.page + 1"
+      [totalItems]="totalCustomers"
+      (onPageChange)="onPageChangeCallback($event)"
+    />
+    <div class="flex-auto"></div>
+    <select [(ngModel)]="searchModel.itemsPerPage" class="rounded-md mb-1 me-1 h-8 text-sm py-1 max-w-xs">
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="75">75</option>
+      <option value="100">100</option>
+    </select>
+  </section>
+</div>

@@ -1,0 +1,28 @@
+<section class="flex flex-col" [ngClass]="{ 'h-full': !isSmallScreen }">
+  <section class="flex-auto">
+    <nav [ngClass]="{ 'flex flex-wrap justify-evenly': isSmallScreen }">
+      <app-nav-link [icon]="faHouse" link="/app/home" linkText="Start page" [showSideNav]="showSideNav" />
+      <app-nav-link
+        [icon]="faFileInvoice"
+        link="/app/orders"
+        linkText="Orders & Invoices"
+        [showSideNav]="showSideNav"
+      />
+      <app-nav-link [icon]="faIdCard" link="/app/customers" linkText="Customers" [showSideNav]="showSideNav" />
+      <app-nav-link [icon]="faDatabase" link="/app/master-data" linkText="Master data" [showSideNav]="showSideNav" />
+    </nav>
+  </section>
+  <section>
+    <div
+      *ngIf="!isSmallScreen"
+      (click)="onToggleSideNav.emit()"
+      class="py-2 flex cursor-pointer items-center justify-start"
+      [ngClass]="{ 'px-4': showSideNav, 'px-1': !showSideNav }"
+    >
+      <span class="w-8 text-center" [ngClass]="{ 'pr-2': showSideNav, 'pr-0': !showSideNav }">
+        <fa-icon [icon]="showSideNav ? faAnglesLeft : faAnglesRight" size="lg" />
+      </span>
+      <span *ngIf="showSideNav">Toggle side menu</span>
+    </div>
+  </section>
+</section>

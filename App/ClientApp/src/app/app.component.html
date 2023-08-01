@@ -1,0 +1,31 @@
+<section class="fixed top-0 right-0 left-0 h-14 bg-blue-500">
+  <app-header [user]="user"></app-header>
+  <header class="border-b-2" *ngIf="user?.isAuthenticated && isSmallScreen">
+    <app-side-nav
+      [showSideNav]="showSideNav"
+      (onToggleSideNav)="toggleSideNavCallback()"
+      [isSmallScreen]="isSmallScreen"
+    />
+  </header>
+</section>
+<section class="h-screen flex flex-row flex-nowrap" [ngClass]="{ 'pt-24': isSmallScreen, 'pt-14': !isSmallScreen }">
+  <div class="absolute right-2 bottom-2">
+    <app-notification-alert />
+  </div>
+
+  <aside
+    *ngIf="user?.isAuthenticated && !isSmallScreen"
+    [ngClass]="{ 'w-64': showSideNav, 'w-min': !showSideNav }"
+    class="border-x-2 flex-none"
+  >
+    <app-side-nav
+      [showSideNav]="showSideNav"
+      (onToggleSideNav)="toggleSideNavCallback()"
+      [isSmallScreen]="isSmallScreen"
+    />
+  </aside>
+
+  <main class="flex-1 overflow-auto">
+    <router-outlet></router-outlet>
+  </main>
+</section>

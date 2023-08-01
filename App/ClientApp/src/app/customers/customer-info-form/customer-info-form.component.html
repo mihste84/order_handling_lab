@@ -1,0 +1,47 @@
+<form novalidate class="mt-3" [formGroup]="form">
+  <fieldset class="border p-4">
+    <legend class="px-2">Customer Info</legend>
+    <section class="mb-2">
+      <ng-container *ngIf="isCompany">
+        <app-form-control label="Company name:" [control]="form.controls['name']">
+          <input input type="text" formControlName="name" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small required>Company name is required</small>
+          <small maxlength>Company name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="Company code:" [control]="form.controls['code']">
+          <input input type="text" formControlName="code" class="rounded-md h-8 text-sm py-1 w-48" />
+          <small required>Company code is required</small>
+          <small maxlength>Company code cannot exceed 30 chars</small>
+        </app-form-control>
+      </ng-container>
+
+      <ng-container *ngIf="!isCompany">
+        <app-form-control label="First name:" [control]="form.controls['firstName']">
+          <input input type="text" formControlName="firstName" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small required>First name is required</small>
+          <small maxlength>First name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="Last name:" [control]="form.controls['lastName']">
+          <input input type="text" formControlName="lastName" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small required>Last name is required</small>
+          <small maxlength>Last name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="Middle name:" [control]="form.controls['middleName']">
+          <input input type="text" formControlName="middleName" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small maxlength>Middle name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="SSN:" [control]="form.controls['ssn']">
+          <input
+            input
+            type="text"
+            formControlName="ssn"
+            class="rounded-md h-8 text-sm py-1 w-48"
+            placeholder="YYYYMMDD-XXXX"
+          />
+          <small required>SSN is required</small>
+          <small pattern>SSN must be in format YYYYMMDD-XXXX</small>
+        </app-form-control>
+      </ng-container>
+    </section>
+  </fieldset>
+</form>

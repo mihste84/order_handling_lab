@@ -1,0 +1,12 @@
+global using Xunit;
+global using App;
+global using Common.Interfaces;
+global using Models.Entities;
+global using Xunit.Extensions.Ordering;
+global using Moq;
+global using Models.Constants;
+global using Common.Models;
+global using Models.Values;
+global using Microsoft.AspNetCore.Mvc.Testing;
+global using System.Net.Http.Json;
+global using Models.Dtos;

@@ -1,0 +1,27 @@
+<app-modal #sharedModal></app-modal>
+
+<div class="p-2 flex flex-col h-full">
+  <section>
+    <h1 class="text-xl">{{ "Customer #" + customer.customerId }}</h1>
+    <h2>{{ getCustomerName() }}</h2>
+  </section>
+  <section class="flex flex-nowrap">
+    <div class="w-96">
+      <div class="mb-3">
+        <app-customer-info-form
+          [customer]="customer"
+          (onUpdateCustomerInfo)="onUpdateCustomerInfoCallback($event)"
+          [isCompany]="isCompany"
+        />
+      </div>
+      <div class="mb-3">
+        <app-contact-info-list
+          [contactInfo]="customer.customerContactInfos || []"
+          (onAddContactInfo)="onAddContactInfoCallback()"
+          (onEditContactInfo)="onEditContactInfoCallback($event)"
+          (onDeleteContactInfo)="onDeleteContactInfoCallback($event)"
+        />
+      </div>
+    </div>
+  </section>
+</div>

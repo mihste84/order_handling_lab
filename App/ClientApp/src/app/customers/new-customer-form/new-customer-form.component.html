@@ -1,0 +1,205 @@
+<form novalidate [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-3">
+  <fieldset class="border p-4">
+    <legend class="text-sm flex justify-evenly w-full mb-2">
+      <span [ngClass]="{ 'opacity-30': currentSection !== FormSection.CustomerInfo }">Customer info</span>
+      <span [ngClass]="{ 'opacity-30': currentSection !== FormSection.AddressInfo }">Address info</span>
+      <span [ngClass]="{ 'opacity-30': currentSection !== FormSection.ContactInfo }">Contact info</span>
+    </legend>
+
+    <section *ngIf="currentSection === FormSection.CustomerInfo" class="mb-2">
+      <app-form-control label="Customer type:" [control]="form.controls['customerType']">
+        <select
+          input
+          class="rounded-md h-8 text-sm py-1 max-w-xs"
+          formControlName="customerType"
+          (ngModelChange)="onCustomerTypeChange($event)"
+        >
+          <option value="person">Person</option>
+          <option value="company">Company</option>
+        </select>
+        <small required>Customer type is required</small>
+      </app-form-control>
+
+      <ng-container *ngIf="isCompany">
+        <app-form-control label="Company name:" [control]="form.controls['name']">
+          <input input type="text" formControlName="name" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small required>Company name is required</small>
+          <small maxlength>Company name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="Company code:" [control]="form.controls['code']">
+          <input input type="text" formControlName="code" class="rounded-md h-8 text-sm py-1 w-48" />
+          <small required>Company code is required</small>
+          <small maxlength>Company code cannot exceed 30 chars</small>
+        </app-form-control>
+      </ng-container>
+
+      <ng-container *ngIf="!isCompany">
+        <app-form-control label="First name:" [control]="form.controls['firstName']">
+          <input input type="text" formControlName="firstName" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small required>First name is required</small>
+          <small maxlength>First name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="Last name:" [control]="form.controls['lastName']">
+          <input input type="text" formControlName="lastName" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small required>Last name is required</small>
+          <small maxlength>Last name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="Middle name:" [control]="form.controls['middleName']">
+          <input input type="text" formControlName="middleName" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+          <small maxlength>Middle name cannot exceed 30 chars</small>
+        </app-form-control>
+        <app-form-control label="SSN:" [control]="form.controls['ssn']">
+          <input
+            input
+            type="text"
+            formControlName="ssn"
+            class="rounded-md h-8 text-sm py-1 w-48"
+            placeholder="YYYYMMDD-XXXX"
+          />
+          <small required>SSN is required</small>
+          <small pattern>SSN must be in format YYYYMMDD-XXXX</small>
+        </app-form-control>
+      </ng-container>
+    </section>
+
+    <section *ngIf="currentSection === FormSection.AddressInfo" formArrayName="customerAddresses" class="mb-2">
+      <ng-container *ngFor="let item of addresses?.controls; let i = index">
+        <hr class="my-3" />
+
+        <div *ngIf="i > 0" class="text-right m-2">
+          <span (click)="onRemoveSecondaryAddress(i)" class="text-sm text-blue-500 whitespace-nowrap cursor-pointer">
+            Remove address
+          </span>
+        </div>
+        <ng-container [formGroupName]="i">
+          <app-form-control label="Address:" [control]="item.get('address')">
+            <input input type="text" formControlName="address" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+            <small required>Address is required</small>
+            <small maxlength>Address cannot exceed 200 chars</small>
+          </app-form-control>
+          <app-form-control label="Post area:" [control]="item.get('postArea')">
+            <input input type="text" formControlName="postArea" class="rounded-md h-8 text-sm py-1 max-w-xs" />
+            <small required>Post area is required</small>
+            <small maxlength>Post area cannot exceed 50 chars</small>
+          </app-form-control>
+          <app-form-control label="Zip code:" [control]="item.get('zipCode')">
+            <input input type="text" formControlName="zipCode" class="rounded-md h-8 text-sm py-1 w-24" />
+            <small required>Zip code is required</small>
+            <small maxlength>Zip code cannot exceed 10 chars</small>
+          </app-form-control>
+          <app-form-control label="Country:" [control]="item.get('countryId')">
+            <select
+              input
+              class="rounded-md h-8 text-sm py-1 max-w-xs"
+              formControlName="countryId"
+              (ngModelChange)="onCountryChange($event, item.get('cityId'))"
+            >
+              <option *ngFor="let country of cache.masterData?.countries" [value]="country.id">
+                {{ country.name }}
+              </option>
+            </select>
+            <small required>Country is required</small>
+          </app-form-control>
+          <app-form-control label="City:" [control]="item.get('cityId')">
+            <select input class="rounded-md h-8 text-sm py-1 max-w-xs" formControlName="cityId">
+              <option *ngFor="let city of selectedCities" [value]="city.id">{{ city.name }}</option>
+            </select>
+            <small required>City is required</small>
+          </app-form-control>
+        </ng-container>
+      </ng-container>
+      <div *ngIf="addresses.length < 3" class="text-right">
+        <span (click)="onAddSecondaryAddress()" class="text-sm text-blue-500 whitespace-nowrap cursor-pointer">
+          Add secondary address
+        </span>
+      </div>
+    </section>
+
+    <section *ngIf="currentSection === FormSection.ContactInfo" formArrayName="contactInfo" class="mb-2">
+      <ng-container *ngFor="let item of contactInfo?.controls; let i = index">
+        <div *ngIf="i > 0" class="text-right">
+          <span class="text-sm text-blue-500 whitespace-nowrap cursor-pointer" (click)="onRemoveContactInfo(i)">
+            Remove contact info
+          </span>
+        </div>
+
+        <article [formGroupName]="i" class="flex">
+          <select
+            input
+            class="rounded-md h-8 text-sm py-1 max-w-xs me-2"
+            formControlName="type"
+            (ngModelChange)="onChangeContactInfoType($event, item.get('value'))"
+          >
+            <option value="Phone">Phone</option>
+            <option value="E-mail">E-mail</option>
+            <option value="Fax">Fax</option>
+            <option value="Website">Website URL</option>
+          </select>
+          <div *ngIf="item.get('type')?.value === 'Phone' || item.get('type')?.value === 'Fax'" class="flex">
+            <select input class="rounded-md rounded-e-none h-8 text-sm py-1 w-22" formControlName="prefix">
+              <option *ngFor="let item of cache.masterData?.countries" [value]="item.phonePrefix">
+                {{ item.phonePrefix }}
+              </option>
+            </select>
+            <input type="number" formControlName="value" class="rounded-md rounded-s-none h-8 text-sm py-1 w-full" />
+          </div>
+          <div *ngIf="item.get('type')?.value === 'E-mail'">
+            <input
+              type="email"
+              formControlName="value"
+              class="rounded-md h-8 text-sm py-1 w-full"
+              placeholder="text@example.com"
+            />
+          </div>
+          <div *ngIf="item.get('type')?.value === 'Website'">
+            <input
+              type="url"
+              formControlName="value"
+              class="rounded-md h-8 text-sm py-1 w-full"
+              placeholder="https://test.com"
+            />
+          </div>
+        </article>
+        <app-form-error [control]="item.get('value')" class="text-right">
+          <small required>Value is required</small>
+          <small invalidUrl>Website URL must be in format https://test.com</small>
+          <small invalidEmail>E-mail must be in format test@example.com</small>
+          <small invalidPhone>Phone number must be in format 12345678</small>
+        </app-form-error>
+      </ng-container>
+      <div *ngIf="contactInfo.length < 5" class="text-right my-2">
+        <span (click)="onAddContactInfo()" class="text-sm text-blue-500 whitespace-nowrap cursor-pointer">
+          Add contact info
+        </span>
+      </div>
+    </section>
+
+    <section class="flex items-center">
+      <button
+        *ngIf="currentSection !== FormSection.CustomerInfo"
+        (click)="onPreviousPage()"
+        type="button"
+        class="border rounded-md px-2 py-1 bg-gray-500 text-white whitespace-nowrap"
+      >
+        Previous
+      </button>
+      <div class="flex-auto"></div>
+      <button
+        *ngIf="currentSection !== FormSection.ContactInfo"
+        type="button"
+        (click)="onNextPage()"
+        class="border rounded-md px-2 py-1 bg-gray-500 text-white whitespace-nowrap"
+      >
+        Next
+      </button>
+      <button
+        *ngIf="currentSection === FormSection.ContactInfo"
+        type="submit"
+        [disabled]="form.invalid"
+        class="border rounded-md px-2 py-1 bg-blue-500 text-white whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Submit
+      </button>
+    </section>
+  </fieldset>
+</form>

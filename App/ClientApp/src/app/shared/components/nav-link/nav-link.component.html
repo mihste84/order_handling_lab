@@ -1,0 +1,11 @@
+<a
+  [routerLink]="link"
+  routerLinkActive="pointer-events-none opacity-50"
+  class="py-2 flex cursor-pointer items-center justify-start hover:opacity-70"
+  [ngClass]="{ 'px-4': showSideNav, 'px-1': !showSideNav }"
+>
+  <span class="w-8 text-center" [ngClass]="{ 'pr-2': showSideNav, 'pr-0': !showSideNav }">
+    <fa-icon [icon]="$any(icon)" size="lg" />
+  </span>
+  <span *ngIf="showSideNav">{{ linkText }}</span>
+</a>
