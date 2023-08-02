@@ -1,6 +1,11 @@
+using System.Reflection;
 using Customers.BaseCustomers.Commands;
+using Customers.BaseCustomers.Queries;
 using Customers.CommonModels;
 using Customers.Constants;
+using Microsoft.Extensions.Primitives;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Collections;
 
 namespace IntegrationTests.ApiTests;
 
@@ -173,7 +178,6 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         Assert.Null(customer);
     }
 
-
     [Fact]
     public async Task Get_Customer_By_Ssn()
     {
@@ -227,6 +231,44 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         Assert.Equal(insertCommand.Ssn, res.Ssn);
         Assert.NotEmpty(res.CustomerAddresses!);
         Assert.NotEmpty(res.CustomerContactInfos!);
+    }
+
+    [Fact]
+    public async Task Search_Customers()
+    {
+        await _testBase.ResetDbAsync();
+        await InsertSearchTestCustomersAsync();
+
+        var query = new SearchCustomersQuery
+        {
+            StartRow = 1,
+            EndRow = 15,
+            OrderBy = "Id",
+            OrderByDirection = "ASC",
+            SearchItems = new[] { new SearchItem("FirstName", "Company", SearchOperators.StartsWith) }
+        };
+
+        var queryString = GetQueryStringFromObject("/api/customer/search", query);
+        var result = await _testBase.HttpClient.GetFromJsonAsync<SearchResult<CustomerDto>>(queryString);
+
+        Assert.NotNull(result);
+        Assert.Equal(expectedCount, 2);
+    }
+
+    public static IEnumerable<object[]> SearchTestData()
+    {
+        yield return new object[] { new[] { new SearchItem("FirstName", "Company", SearchOperators.StartsWith) }, 2 };
+        yield return new object[] { new[] {
+            new SearchItem("FirstName", "Stefan", SearchOperators.Equal),
+            new SearchItem("LastName", "M", SearchOperators.StartsWith)
+        }, 1 };
+        yield return new object[] { new[] {
+            new SearchItem("FirstName", "Stefan", SearchOperators.Equal),
+            new SearchItem("Phone", "+46704551122", SearchOperators.Equal)
+        }, 1 };
+        yield return new object[] { new[] {
+            new SearchItem("Email", "company1", SearchOperators.StartsWith)
+        }, 1 };
     }
 
     private async Task<SqlResult?> InsertCustomerAsync(InsertCustomerCommand model)
@@ -301,6 +343,33 @@ public sealed class CustomerTests : IClassFixture<TestBase>
             new InsertCustomerCommand()
             {
                 FirstName = "Stefan",
+                LastName = "Mihailovic",
+                Ssn = "19840324-1234",
+                IsCompany = false,
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "Regementsgatan 1",
+                        CityId = 1,
+                        CountryId = 1,
+                        IsPrimary = true,
+                        PostArea = "Solna",
+                        ZipCode = "54321"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "stefan.mihailovic@mail.com"
+                    },
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Phone,
+                        Value = "+46704551122"
+                    }
+                }
+            },
+            new InsertCustomerCommand()
+            {
+                FirstName = "Stefan",
                 LastName = "Larsson",
                 Ssn = "12345678-1234",
                 IsCompany = false,
@@ -355,7 +424,10 @@ public sealed class CustomerTests : IClassFixture<TestBase>
             },
         };
 
-        await Parallel.ForEachAsync(customers, async (command, _) => await InsertCustomerAsync(command));
+        foreach (var customer in customers)
+        {
+            await InsertCustomerAsync(customer);
+        }
     }
 
     private static InsertCustomerCommand GetBaseInsertCustomerCompanyCommand()
@@ -406,4 +478,38 @@ public sealed class CustomerTests : IClassFixture<TestBase>
             }
         }
     };
+
+    private static string GetQueryStringFromObject(string basePath, object model)
+    {
+        var queryParams = new List<KeyValuePair<string, StringValues>>();
+        var props = model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        foreach (var prop in props)
+        {
+            var stringValue = GetStringValue(prop.GetValue(model, null)!);
+            if (stringValue.Count == 0)
+                continue;
+
+            var newPair = new KeyValuePair<string, StringValues>(prop.Name, stringValue);
+            queryParams.Add(newPair);
+        }
+
+        return QueryHelpers.AddQueryString(basePath, queryParams);
+    }
+
+    private static string[] GetStringArray(IList list)
+    {
+        var stringList = new List<string>();
+        foreach (var item in list)
+            stringList.Add(item.ToString()!);
+
+        return stringList.ToArray();
+    }
+
+    private static StringValues GetStringValue(object value)
+    {
+        if (value == null) return StringValues.Empty;
+        return value is IList list
+            ? list.Count > 0 ? new StringValues(GetStringArray(list)) : StringValues.Empty
+            : new StringValues(value.ToString());
+    }
 }
