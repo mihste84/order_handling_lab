@@ -80,9 +80,9 @@ public class CustomerRepository : ICustomerRepository
         var data = await reader.ReadAsync();
         if (data == null) return new(0, Array.Empty<Customer>());
 
-        var count = await reader.ReadFirstOrDefaultAsync<int>();
+        var count = await reader.ReadFirstAsync<int>();
 
-        return new SearchResult<Customer>(count, data!.Select(_ => new Customer
+        return new SearchResult<Customer>(count, data.Select(_ => new Customer
         {
             Active = _.Active,
             Created = _.Created,

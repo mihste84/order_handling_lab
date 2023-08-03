@@ -1,22 +1,6 @@
 namespace Common.Models;
 
 public record SearchItem(string Name, string? Value, string Operator, bool HandleAutomatically = true);
-// public class SearchItem
-// {
-//     public SearchItem() { }
-//     public SearchItem(string? name, string? value, string? @operator, bool handleAutomatically = true)
-//     {
-//         Name = name;
-//         Value = value;
-//         Operator = @operator;
-//         HandleAutomatically = handleAutomatically;
-//     }
-//     public string? Name { get; set; } = string.Empty;
-//     public string? Value { get; set; }
-//     public string? Operator { get; set; } = SearchOperators.Equal;
-//     public bool HandleAutomatically { get; set; } = true;
-// }
-
 
 public static class SearchOperators
 {
@@ -55,8 +39,8 @@ public class DynamicSearchQuery
         SearchOperators.StartsWith => $"{item.Name:raw} LIKE '{item.Value + "%"}'",
         SearchOperators.EndsWith => $"{item.Name:raw} LIKE '{"%" + item.Value}'",
         SearchOperators.Contains => $"{item.Name:raw} LIKE '{"%" + item.Value + "%"}'",
-        SearchOperators.In => $"{item.Name:raw} IN {item.Value}",
-        SearchOperators.NotIn => $"{item.Name:raw} NOT IN {item.Value}",
+        SearchOperators.In => $"{item.Name:raw} IN ({item.Value?.Split(',')})",
+        SearchOperators.NotIn => $"{item.Name:raw} NOT IN ({item.Value?.Split(',')})",
         SearchOperators.IsNull => $"{item.Name:raw} IS NULL",
         SearchOperators.IsNotNull => $"{item.Name:raw} IS NOT NULL",
         _ => throw new ArgumentOutOfRangeException($"Operator '{item.Operator}' not supported.")

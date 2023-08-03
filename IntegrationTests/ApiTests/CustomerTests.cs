@@ -6,6 +6,7 @@ using Customers.Constants;
 using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Collections;
+using System.Net;
 
 namespace IntegrationTests.ApiTests;
 
@@ -238,11 +239,11 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Search_Customers(SearchItem[] searchItems, int expectedCount)
     {
         await _testBase.ResetDbAsync();
-        // await InsertSearchTestCustomersAsync();
+        await InsertSearchTestCustomersAsync();
 
         var query = new SearchCustomersQuery
         {
-            StartRow = 1,
+            StartRow = 0,
             EndRow = 15,
             OrderBy = "Id",
             OrderByDirection = "ASC",
@@ -250,23 +251,104 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         };
 
         var queryString = GetQueryStringFromObject("/api/customer/search", query);
-        var result = await _testBase.HttpClient.GetAsync(queryString);
-        // result.Content.ReadFromJsonAsync<SearchResult<CustomerDto>>();
+        var response = await _testBase.HttpClient.GetAsync(queryString);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<SearchResult<CustomerDto>>();
+        Assert.NotNull(result);
+        Assert.IsType<SearchResult<CustomerDto>>(result);
+        Assert.Equal(expectedCount, result.TotalCount);
+    }
+
+    [Fact]
+    public async Task Search_Customers_Pagination()
+    {
+        await _testBase.ResetDbAsync();
+        await InsertSearchTestCustomersAsync();
+
+        var query = new SearchCustomersQuery
+        {
+            StartRow = 0,
+            EndRow = 2,
+            OrderBy = "Id",
+            OrderByDirection = "ASC"
+        };
+
+        for (var i = 0; i < 3; i++)
+        {
+            query.StartRow = i * 2;
+            query.EndRow = query.StartRow + 2;
+            var queryString = GetQueryStringFromObject("/api/customer/search", query);
+            var response = await _testBase.HttpClient.GetAsync(queryString);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var result = await response.Content.ReadFromJsonAsync<SearchResult<CustomerDto>>();
+            Assert.NotNull(result);
+            Assert.IsType<SearchResult<CustomerDto>>(result);
+            Assert.Equal(8, result.TotalCount);
+            Assert.Equal(2, result.Items.Count());
+        }
+    }
+
+    [Fact]
+    public async Task Search_Customers_Not_Found()
+    {
+        await _testBase.ResetDbAsync();
+        await InsertSearchTestCustomersAsync();
+
+        var query = new SearchCustomersQuery
+        {
+            StartRow = 0,
+            EndRow = 2,
+            OrderBy = "Id",
+            OrderByDirection = "ASC",
+            SearchItems = new[] {
+                new SearchItem("FirstName", "NotExisting", SearchOperators.Equal)
+            }
+        };
+
+        var queryString = GetQueryStringFromObject("/api/customer/search", query);
+        var response = await _testBase.HttpClient.GetAsync(queryString);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
     public static IEnumerable<object[]> SearchTestData()
     {
-        yield return new object[] { new[] { new SearchItem("FirstName", "Company", SearchOperators.StartsWith) }, 2 };
+        yield return new object[] { new[] { new SearchItem("Name", "Company", SearchOperators.StartsWith) }, 2 };
         yield return new object[] { new[] {
             new SearchItem("FirstName", "Stefan", SearchOperators.Equal),
             new SearchItem("LastName", "M", SearchOperators.StartsWith)
         }, 1 };
+        yield return new object[] { new[] {
+            new SearchItem("FirstName", "Stefan", SearchOperators.NotEqual)
+        }, 3 };
         yield return new object[] { new[] {
             new SearchItem("FirstName", "Stefan", SearchOperators.Equal),
             new SearchItem("Phone", "+46704551122", SearchOperators.Equal, false)
         }, 1 };
         yield return new object[] { new[] {
             new SearchItem("Email", "company1", SearchOperators.StartsWith, false)
+        }, 1 };
+        yield return new object[] { new[] {
+            new SearchItem("FirstName", "j", SearchOperators.Contains)
+        }, 1 };
+        yield return new object[] { new[] {
+            new SearchItem("FirstName", "an", SearchOperators.EndsWith)
+        }, 3 };
+        yield return new object[] { new[] {
+            new SearchItem("CityId", "3", SearchOperators.Equal, false)
+        }, 2 };
+        yield return new object[] { new[] {
+            new SearchItem("CityId", "3", SearchOperators.GreaterThanOrEqual, false)
+        }, 3 };
+        yield return new object[] { new[] {
+            new SearchItem("CityId", "3", SearchOperators.LessThan, false)
+        }, 6 };
+        yield return new object[] { new[] {
+            new SearchItem("FirstName", "Stefan", SearchOperators.Equal),
+            new SearchItem("LastName", "Mih", SearchOperators.StartsWith),
+            new SearchItem("MiddleName", "", SearchOperators.IsNull),
+            new SearchItem("CityId", "1", SearchOperators.Equal, false)
         }, 1 };
     }
 
@@ -341,6 +423,28 @@ public sealed class CustomerTests : IClassFixture<TestBase>
             },
             new InsertCustomerCommand()
             {
+                Name = "Danish Company",
+                Code = "45654841321",
+                IsCompany = true,
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "658 Main St",
+                        CityId = 4,
+                        CountryId = 4,
+                        IsPrimary = true,
+                        PostArea = "Kopenhagen",
+                        ZipCode = "44444"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "danish_company@mail.com"
+                    }
+                }
+            },
+            new InsertCustomerCommand()
+            {
                 FirstName = "Stefan",
                 LastName = "Mihailovic",
                 Ssn = "19840324-1234",
@@ -390,6 +494,30 @@ public sealed class CustomerTests : IClassFixture<TestBase>
                     }
                 }
             },
+             new InsertCustomerCommand()
+            {
+                FirstName = "Johan",
+                LastName = "Larsson",
+                Ssn = "89784561-1234",
+                IsCompany = false,
+                MiddleName = "Lars",
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "111 Main St",
+                        CityId = 1,
+                        CountryId = 1,
+                        IsPrimary = true,
+                        PostArea = "Solna",
+                        ZipCode = "54321"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "johan.larsson@mail.com"
+                    }
+                }
+            },
             new InsertCustomerCommand()
             {
                 FirstName = "Lars",
@@ -418,6 +546,29 @@ public sealed class CustomerTests : IClassFixture<TestBase>
                     new CustomerContactInfoModel {
                         Type = ContactInfoType.Email,
                         Value = "Lars.Nilsson@mail.com"
+                    }
+                }
+            },
+            new InsertCustomerCommand()
+            {
+                FirstName = "Lars",
+                LastName = "Nilsson",
+                Ssn = "45874612-1234",
+                IsCompany = false,
+                CustomerAddresses = new[] {
+                    new CustomerAddressModel {
+                        Address = "ASDF St",
+                        CityId = 3,
+                        CountryId = 3,
+                        IsPrimary = true,
+                        PostArea = "ABC",
+                        ZipCode = "78945"
+                    }
+                },
+                ContactInfo = new[] {
+                    new CustomerContactInfoModel {
+                        Type = ContactInfoType.Email,
+                        Value = "Lars.Nilsson11@mail.com"
                     }
                 }
             },

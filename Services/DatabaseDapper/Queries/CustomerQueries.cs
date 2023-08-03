@@ -143,7 +143,7 @@ public static class CustomerQueries
             LEFT JOIN dbo.CustomerCompanies co ON c.[Id] = co.[CustomerId]
             LEFT JOIN dbo.CustomerPersons cp ON c.[Id] = cp.[CustomerId]
             /**where**/
-        ) x
+        ) x 
         ORDER BY {query.OrderBy:raw} {query.OrderByDirection:raw}
         OFFSET {query.StartRow:raw} ROWS FETCH NEXT {query.EndRow - query.StartRow:raw} ROWS ONLY;
 
