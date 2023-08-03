@@ -1,6 +1,22 @@
 namespace Common.Models;
 
 public record SearchItem(string Name, string? Value, string Operator, bool HandleAutomatically = true);
+// public class SearchItem
+// {
+//     public SearchItem() { }
+//     public SearchItem(string? name, string? value, string? @operator, bool handleAutomatically = true)
+//     {
+//         Name = name;
+//         Value = value;
+//         Operator = @operator;
+//         HandleAutomatically = handleAutomatically;
+//     }
+//     public string? Name { get; set; } = string.Empty;
+//     public string? Value { get; set; }
+//     public string? Operator { get; set; } = SearchOperators.Equal;
+//     public bool HandleAutomatically { get; set; } = true;
+// }
+
 
 public static class SearchOperators
 {

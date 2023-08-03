@@ -46,7 +46,7 @@ public class CustomerRepository : ICustomerRepository
         if (DynamicSearchQuery.TryExtractSearchItemByName(query.SearchItems, "Phone", out var item))
         {
             var sql = DynamicSearchQuery.GetWhereFromSearchItem(
-                new SearchItem("Value", item!.Value, item!.Operator, item!.HandleAutomatically) // Overwrite name to "Value"
+                new SearchItem("Value", item!.Value, item.Operator, item.HandleAutomatically) // Overwrite name to "Value"
             );
             customerQuery.Where(
                 $"c.[Id] IN (SELECT [CustomerId] FROM [dbo].[CustomerContactInfo] WHERE {sql} AND Type = {ContactInfoType.Phone})"

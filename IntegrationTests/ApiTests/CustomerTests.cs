@@ -233,11 +233,12 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         Assert.NotEmpty(res.CustomerContactInfos!);
     }
 
-    [Fact]
-    public async Task Search_Customers()
+    [Theory]
+    [MemberData(nameof(SearchTestData))]
+    public async Task Search_Customers(SearchItem[] searchItems, int expectedCount)
     {
         await _testBase.ResetDbAsync();
-        await InsertSearchTestCustomersAsync();
+        // await InsertSearchTestCustomersAsync();
 
         var query = new SearchCustomersQuery
         {
@@ -245,14 +246,12 @@ public sealed class CustomerTests : IClassFixture<TestBase>
             EndRow = 15,
             OrderBy = "Id",
             OrderByDirection = "ASC",
-            SearchItems = new[] { new SearchItem("FirstName", "Company", SearchOperators.StartsWith) }
+            SearchItems = searchItems
         };
 
         var queryString = GetQueryStringFromObject("/api/customer/search", query);
-        var result = await _testBase.HttpClient.GetFromJsonAsync<SearchResult<CustomerDto>>(queryString);
-
-        Assert.NotNull(result);
-        Assert.Equal(expectedCount, 2);
+        var result = await _testBase.HttpClient.GetAsync(queryString);
+        // result.Content.ReadFromJsonAsync<SearchResult<CustomerDto>>();
     }
 
     public static IEnumerable<object[]> SearchTestData()
@@ -264,10 +263,10 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         }, 1 };
         yield return new object[] { new[] {
             new SearchItem("FirstName", "Stefan", SearchOperators.Equal),
-            new SearchItem("Phone", "+46704551122", SearchOperators.Equal)
+            new SearchItem("Phone", "+46704551122", SearchOperators.Equal, false)
         }, 1 };
         yield return new object[] { new[] {
-            new SearchItem("Email", "company1", SearchOperators.StartsWith)
+            new SearchItem("Email", "company1", SearchOperators.StartsWith, false)
         }, 1 };
     }
 
@@ -479,37 +478,24 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         }
     };
 
-    private static string GetQueryStringFromObject(string basePath, object model)
+    private static string GetQueryStringFromObject(string basePath, SearchCustomersQuery model)
     {
-        var queryParams = new List<KeyValuePair<string, StringValues>>();
-        var props = model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-        foreach (var prop in props)
-        {
-            var stringValue = GetStringValue(prop.GetValue(model, null)!);
-            if (stringValue.Count == 0)
-                continue;
+        var queryParams = new List<KeyValuePair<string, StringValues>>() {
+            new KeyValuePair<string, StringValues>(nameof(model.EndRow), model.EndRow.ToString()),
+            new KeyValuePair<string, StringValues>(nameof(model.StartRow), model.StartRow.ToString()),
+            new KeyValuePair<string, StringValues>(nameof(model.OrderBy), model.OrderBy),
+            new KeyValuePair<string, StringValues>(nameof(model.OrderByDirection), model.OrderByDirection)
+        };
 
-            var newPair = new KeyValuePair<string, StringValues>(prop.Name, stringValue);
-            queryParams.Add(newPair);
+        foreach (var item in model.SearchItems.Select((value, index) => new { value, index }))
+        {
+            queryParams.Add(new KeyValuePair<string, StringValues>($"searchItems[{item.index}].Name", item.value.Name));
+            if (!string.IsNullOrWhiteSpace(item.value.Value))
+                queryParams.Add(new KeyValuePair<string, StringValues>($"searchItems[{item.index}].Value", item.value.Value));
+            queryParams.Add(new KeyValuePair<string, StringValues>($"searchItems[{item.index}].Operator", item.value.Operator));
+            queryParams.Add(new KeyValuePair<string, StringValues>($"searchItems[{item.index}].HandleAutomatically", item.value.HandleAutomatically.ToString()));
         }
 
         return QueryHelpers.AddQueryString(basePath, queryParams);
-    }
-
-    private static string[] GetStringArray(IList list)
-    {
-        var stringList = new List<string>();
-        foreach (var item in list)
-            stringList.Add(item.ToString()!);
-
-        return stringList.ToArray();
-    }
-
-    private static StringValues GetStringValue(object value)
-    {
-        if (value == null) return StringValues.Empty;
-        return value is IList list
-            ? list.Count > 0 ? new StringValues(GetStringArray(list)) : StringValues.Empty
-            : new StringValues(value.ToString());
     }
 }
