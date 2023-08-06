@@ -11,7 +11,7 @@ public class CustomerController : BaseController
         return result.Match<IActionResult>(
             success => Ok(success.Value),
             notFound => NoContent(),
-            validationError => BadRequest(validationError)
+            ValidationBadRequest
         );
     }
 
@@ -22,7 +22,7 @@ public class CustomerController : BaseController
         return result.Match<IActionResult>(
             success => Ok(success.Value),
             notFound => NotFound(),
-            validationError => BadRequest(validationError)
+            ValidationBadRequest
         );
     }
 
@@ -33,7 +33,7 @@ public class CustomerController : BaseController
         return result.Match<IActionResult>(
             success => Ok(success.Value),
             error => StatusCode(500, new { Message = error.Value }),
-            validationError => BadRequest(validationError)
+            ValidationBadRequest
         );
     }
 
@@ -45,7 +45,7 @@ public class CustomerController : BaseController
             success => Ok(success.Value),
             notFound => NotFound(),
             error => StatusCode(500, new { Message = error.Value }),
-            validationError => BadRequest(validationError)
+            ValidationBadRequest
         );
     }
 
@@ -55,8 +55,8 @@ public class CustomerController : BaseController
         var result = await Mediator.Send(new DeleteCustomerCommand { Id = id });
         return result.Match<IActionResult>(
             success => Ok(),
-            error => StatusCode(500, new { Message = error.Value }),
-            validationError => BadRequest(validationError)
+            notFound => NotFound(),
+            ValidationBadRequest
         );
     }
 }
