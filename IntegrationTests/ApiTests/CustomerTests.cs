@@ -1,12 +1,11 @@
-using System.Reflection;
 using Customers.BaseCustomers.Commands;
 using Customers.BaseCustomers.Queries;
 using Customers.CommonModels;
 using Customers.Constants;
 using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Collections;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IntegrationTests.ApiTests;
 
@@ -82,6 +81,21 @@ public sealed class CustomerTests : IClassFixture<TestBase>
         var contactInfo = command.ContactInfo!.First();
         Assert.Equal(contactInfo.Type, customer.CustomerContactInfos.First().Type);
         Assert.Equal(contactInfo.Value, customer.CustomerContactInfos.First().Value);
+    }
+
+    [Fact]
+    public async Task Insert_Customer_Company_Validation_Error()
+    {
+        await _testBase.ResetDbAsync();
+        var command = new InsertCustomerCommand { IsCompany = true };
+        var response = await _testBase.HttpClient.PostAsJsonAsync("/api/customer", command);
+
+        Assert.NotNull(response);
+        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+        var error = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.NotNull(error);
+        Assert.NotNull(error.Extensions);
+        Assert.True(error.Extensions.ContainsKey("errors"));
     }
 
     [Fact]

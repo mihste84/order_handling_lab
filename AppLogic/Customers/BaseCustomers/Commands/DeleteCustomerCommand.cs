@@ -1,6 +1,6 @@
 namespace Customers.BaseCustomers.Commands;
 
-public class DeleteCustomerCommand : IRequest<OneOf<Success, Error<string>, ValidationError>>
+public class DeleteCustomerCommand : IRequest<OneOf<Success, NotFound, ValidationError>>
 {
     public int? Id { get; set; }
 
@@ -12,7 +12,7 @@ public class DeleteCustomerCommand : IRequest<OneOf<Success, Error<string>, Vali
         }
     }
 
-    public class DeleteCustomerHandler : IRequestHandler<DeleteCustomerCommand, OneOf<Success, Error<string>, ValidationError>>
+    public class DeleteCustomerHandler : IRequestHandler<DeleteCustomerCommand, OneOf<Success, NotFound, ValidationError>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<DeleteCustomerCommand> _validator;
@@ -23,7 +23,7 @@ public class DeleteCustomerCommand : IRequest<OneOf<Success, Error<string>, Vali
             _unitOfWork = unitOfWork;
             _validator = validator;
         }
-        public async Task<OneOf<Success, Error<string>, ValidationError>> Handle(
+        public async Task<OneOf<Success, NotFound, ValidationError>> Handle(
             DeleteCustomerCommand request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request, cancellationToken);
@@ -32,7 +32,7 @@ public class DeleteCustomerCommand : IRequest<OneOf<Success, Error<string>, Vali
 
             var succeess = await _unitOfWork.CustomerRepository.DeleteByIdAsync(request.Id!.Value);
             if (!succeess)
-                return new Error<string>("Failed to delete customer");
+                return new NotFound();
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

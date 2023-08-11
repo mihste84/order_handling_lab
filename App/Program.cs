@@ -36,13 +36,19 @@ builder.Services.Configure<CookieAuthenticationOptions>(o => o.LoginPath = PathS
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseCors(_ => _.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200").AllowCredentials());
+    app.UseDeveloperExceptionPage();
     app.UseHttpLogging();
 }
 else
