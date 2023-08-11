@@ -8,9 +8,9 @@ public class CustomerController : BaseController
     public async Task<IActionResult> Search([FromQuery] SearchCustomersQuery model)
     {
         var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
-            notFound => NoContent(),
+        return result.Match(
+            Ok,
+            _ => NoContent(),
             ValidationBadRequest
         );
     }
@@ -19,9 +19,9 @@ public class CustomerController : BaseController
     public async Task<IActionResult> Get([FromQuery] GetCustomerByValueQuery model)
     {
         var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
-            notFound => NotFound(),
+        return result.Match(
+            Ok,
+            _ => NotFound(),
             ValidationBadRequest
         );
     }
@@ -30,9 +30,9 @@ public class CustomerController : BaseController
     public async Task<IActionResult> Post([FromBody] InsertCustomerCommand model)
     {
         var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
-            error => StatusCode(500, new { Message = error.Value }),
+        return result.Match(
+            Ok,
+            InternalServerError,
             ValidationBadRequest
         );
     }
@@ -41,10 +41,10 @@ public class CustomerController : BaseController
     public async Task<IActionResult> Patch([FromBody] UpdateCustomerCommand model)
     {
         var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
+        return result.Match(
+            Ok,
             _ => NotFound(),
-            error => StatusCode(500, new { Message = error.Value }),
+            InternalServerError,
             ValidationBadRequest
         );
     }
@@ -53,9 +53,9 @@ public class CustomerController : BaseController
     public async Task<IActionResult> Delete(int? id)
     {
         var result = await Mediator.Send(new DeleteCustomerCommand { Id = id });
-        return result.Match<IActionResult>(
-            success => Ok(),
-            notFound => NotFound(),
+        return result.Match(
+            _ => Ok(),
+            _ => NotFound(),
             ValidationBadRequest
         );
     }

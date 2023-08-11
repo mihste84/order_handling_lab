@@ -6,6 +6,8 @@ import { firstValueFrom } from 'rxjs';
 import { SqlResult } from '../../shared/models/types';
 import { NotificationService } from '../../shared/services/notification.service';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { ContactInfoFormComponent, ContactInfoModel } from '../contact-info-form/contact-info-form.component';
+import { ConfirmComponent } from 'src/app/shared/components/confirm/confirm.component';
 
 @Component({
   selector: 'app-edit-customer-page',
@@ -54,26 +56,84 @@ export class EditCustomerPageComponent implements OnInit {
     }
   }
 
-  public async onAddContactInfoCallback() {}
-  public async onDeleteContactInfoCallback(info: ContactInfo) {}
+  public async onAddContactInfoCallback() {
+    if (!this.sharedModal) throw new Error('Shared modal is not initialized.');
+    const ref = this.sharedModal.showModalWithComponent(ContactInfoFormComponent, undefined, 'Add contact info');
+    ref?.instance.onFormSubmit.subscribe(async (model: ContactInfoModel) => {
+      model.customerId = this.customer.id;
+      const postUser$ = this.http.post<SqlResult>('ContactInfo', model);
+      const res = await firstValueFrom(postUser$);
+      if (!this.customer.customerContactInfos) this.customer.customerContactInfos = [];
+      this.customer.customerContactInfos.push(this.getContactInfoFromModel(model, res));
+      this.sharedModal!.hideModal();
+      this.notifications.addNotification(`Contact info added successfully.`, 'Contact info added');
+    });
+  }
+  public async onDeleteContactInfoCallback(info: ContactInfo) {
+    if (!this.sharedModal) throw new Error('Shared modal is not initialized.');
+
+    const ref = this.sharedModal.showModalWithComponent(
+      ConfirmComponent,
+      [
+        {
+          name: 'message',
+          value: `Are you sure you want to delete customer info with value "${info.prefix ?? ''}${info.value}"?`,
+        },
+        { name: 'returnObject', value: info },
+      ],
+      `Delete customer info`
+    );
+
+    ref?.instance.onConfirm.subscribe(async (c: ContactInfo) => {
+      const deleteUser$ = this.http.delete('ContactInfo/' + c.id);
+      await firstValueFrom(deleteUser$);
+      this.customer.customerContactInfos = this.customer.customerContactInfos.filter((_) => _.id !== c.id);
+      this.notifications.addNotification(
+        `Contact info value ${c.prefix ?? ''}${c.value} deleted successfully.`,
+        'Contact info deleted'
+      );
+      this.sharedModal!.hideModal();
+    });
+
+    ref?.instance.onCancel.subscribe(() => {
+      this.sharedModal!.hideModal();
+    });
+  }
+
   public async onEditContactInfoCallback(info: ContactInfo) {
     if (!this.sharedModal) throw new Error('Shared modal is not initialized.');
-    // const ref = this.sharedModal.showModalWithComponent(
-    //   ConfirmComponent,
-    //   [
-    //     { name: 'message', value: `Are you sure you want to delete customer with ID "${customer.id}"?` },
-    //     { name: 'returnObject', value: customer },
-    //   ],
-    //   `Delete customer #${customer.id}`
-    // );
-    // ref?.instance.onConfirm.subscribe(async (c: SearchCustomer) => {
-    //   await this.onDeleteCustomer(c);
-    //   this.sharedModal!.hideModal();
-    // });
+    const ref = this.sharedModal.showModalWithComponent(
+      ContactInfoFormComponent,
+      [
+        {
+          name: 'contactInfo',
+          value: info,
+        },
+      ],
+      'Edit contact info'
+    );
+    ref?.instance.onFormSubmit.subscribe(async (model: ContactInfoModel) => {
+      const putUser$ = this.http.put<SqlResult>('ContactInfo', model);
+      const res = await firstValueFrom(putUser$);
+      this.customer.customerContactInfos = this.customer.customerContactInfos.map((_) =>
+        _.id !== info.id ? _ : this.getContactInfoFromModel(model, res)
+      );
+      this.sharedModal!.hideModal();
+      this.notifications.addNotification(`Contact info edited successfully.`, 'Contact info edited');
+    });
+  }
 
-    // ref?.instance.onCancel.subscribe(() => {
-    //   this.sharedModal!.hideModal();
-    // });
+  private getContactInfoFromModel(model: ContactInfoModel, res: SqlResult): ContactInfo {
+    model.value = model.value?.replace(model.prefix ?? '', '');
+
+    return {
+      id: res.id,
+      customerId: this.customer.id,
+      rowVersion: res.rowVersion,
+      type: model.type,
+      prefix: model.prefix,
+      value: model.value,
+    };
   }
 
   ngOnInit(): void {

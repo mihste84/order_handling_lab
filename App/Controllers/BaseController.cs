@@ -1,4 +1,5 @@
 using Common.Models;
+using OneOf.Types;
 
 namespace App.Controllers;
 
@@ -6,6 +7,16 @@ namespace App.Controllers;
 public class BaseController : ControllerBase
 {
     protected IMediator Mediator => HttpContext.RequestServices.GetRequiredService<IMediator>();
+
+    protected IActionResult Ok<T>(Success<T> success)
+    {
+        return Ok(success.Value);
+    }
+
+    protected IActionResult InternalServerError(Error<string> error)
+    {
+        return StatusCode(500, new { Message = error.Value });
+    }
 
     protected IActionResult ValidationBadRequest(ValidationError error)
     {

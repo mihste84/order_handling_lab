@@ -20,6 +20,6 @@ public class CustomerContactInfoModelValidator : AbstractValidator<CustomerConta
         When(x => x.Type == ContactInfoType.Website,
             () => RuleFor(x => x.Value).Must(x => Uri.TryCreate(x, UriKind.Absolute, out _)));
         When(x => x.Type == ContactInfoType.Phone || x.Type == ContactInfoType.Fax,
-            () => RuleFor(x => x.Value).Matches(@"^[+]\d{10,15}$").WithMessage("Invalid phone number format"));
+            () => RuleFor(x => x.Value).Matches(@"^[+]\d{8,15}$").WithMessage("Invalid phone number format"));
     }
 }

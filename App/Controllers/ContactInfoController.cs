@@ -8,33 +8,33 @@ public class ContactInfoController : BaseController
     public async Task<IActionResult> Post([FromBody] InsertCustomerContactInfoCommand model)
     {
         var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
-            error => StatusCode(500, new { Message = error.Value }),
-            BadRequest
+        return result.Match(
+            Ok,
+            InternalServerError,
+            ValidationBadRequest
         );
     }
 
     [HttpPut]
-    public async Task<IActionResult> Patch([FromBody] UpdateCustomerCommand model)
+    public async Task<IActionResult> Patch([FromBody] UpdateCustomerContactInfoCommand model)
     {
         var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
+        return result.Match(
+            Ok,
             _ => NotFound(),
-            error => StatusCode(500, new { Message = error.Value }),
-            BadRequest
+            InternalServerError,
+            ValidationBadRequest
         );
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int? id)
     {
-        var result = await Mediator.Send(new DeleteCustomerCommand { Id = id });
-        return result.Match<IActionResult>(
+        var result = await Mediator.Send(new DeleteCustomerContactInfoCommand { Id = id });
+        return result.Match(
             _ => Ok(),
-            error => StatusCode(500, new { Message = error.Value }),
-            BadRequest
+            InternalServerError,
+            ValidationBadRequest
         );
     }
 }

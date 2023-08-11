@@ -1,5 +1,5 @@
 <form novalidate [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-3">
-  <fieldset class="border p-4">
+  <fieldset class="border pb-2">
     <legend class="text-sm flex justify-evenly w-full mb-2">
       <span [ngClass]="{ 'opacity-30': currentSection !== FormSection.CustomerInfo }">Customer info</span>
       <span [ngClass]="{ 'opacity-30': currentSection !== FormSection.AddressInfo }">Address info</span>

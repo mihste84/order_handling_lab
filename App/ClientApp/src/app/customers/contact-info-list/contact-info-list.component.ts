@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ContactInfo } from '../customer.resolver';
-import { faTrash, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPencil, faPhone, faFax, faAt, faGlobe } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-contact-info-list',
@@ -14,4 +14,8 @@ export class ContactInfoListComponent {
   @Output() public onAddContactInfo = new EventEmitter<void>();
   public faTrash = faTrash;
   public faPencil = faPencil;
+  public faPhone = faPhone;
+  public faFax = faFax;
+  public faAt = faAt;
+  public faGlobe = faGlobe;
 }

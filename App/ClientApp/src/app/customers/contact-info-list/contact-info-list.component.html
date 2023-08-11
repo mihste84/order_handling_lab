@@ -1,13 +1,19 @@
 <fieldset class="border p-4">
   <legend class="px-2">Contact Info</legend>
-  <article *ngFor="let item of contactInfo" class="flex items-center justify-between mb-2">
-    <p>
-      {{ item.type }}
+  <p *ngIf="!contactInfo?.length" class="text-gray-500">No contact info to display</p>
+  <article *ngFor="let item of contactInfo" class="flex items-center justify-start mb-2">
+    <p class="me-2">
+      <fa-icon *ngIf="item.type === 'Phone'" [icon]="faPhone" />
+      <fa-icon *ngIf="item.type === 'Fax'" [icon]="faFax" />
+      <fa-icon *ngIf="item.type === 'E-mail'" [icon]="faAt" />
+      <fa-icon *ngIf="item.type === 'Website'" [icon]="faGlobe" />
     </p>
     <p *ngIf="item.type === 'Phone' || item.type === 'Fax'">{{ item.prefix }}-{{ item.value }}</p>
     <p *ngIf="item.type === 'E-mail' || item.type === 'Website'">
       {{ item.value }}
     </p>
+    <section class="flex-auto"></section>
+
     <div>
       <button
         class="bg-blue-600 rounded-md px-1 hover:opacity-70 text-white me-1"

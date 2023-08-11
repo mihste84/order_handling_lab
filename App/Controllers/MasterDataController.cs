@@ -9,7 +9,7 @@ public class MasterDataController : BaseController
     {
         var result = await Mediator.Send(new SelectAllMasterDataQuery());
         return result.Match<IActionResult>(
-            success => Ok(success.Value),
+            Ok,
             _ => NotFound()
         );
     }
