@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MasterDataDto } from '../resolvers/master-data.resolver';
-import { SearchCustomer } from 'src/app/customers/customer-page/customer-page.component';
+import { SearchCustomer } from '../../customers/customer-page/customer-page.component';
 import { DynamicSearchQuery } from '../models/dynamic-search-query';
 
 export interface CustomerPage {

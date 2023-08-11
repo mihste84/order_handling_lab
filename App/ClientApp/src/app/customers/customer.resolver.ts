@@ -17,7 +17,6 @@ export interface CustomerCompany {
 
 export interface Customer extends CustomerPerson, CustomerCompany {
   id: number;
-  customerId: number;
   active: boolean;
   created: Date;
   createdBy: string;

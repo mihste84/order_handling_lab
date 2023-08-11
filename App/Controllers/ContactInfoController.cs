@@ -1,33 +1,11 @@
 using Customers.BaseCustomers.Commands;
-using Customers.BaseCustomers.Queries;
+using Customers.CustomerContactInfos.Commands;
 
 namespace App.Controllers;
-public class CustomerController : BaseController
+public class ContactInfoController : BaseController
 {
-    [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] SearchCustomersQuery model)
-    {
-        var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
-            _ => NoContent(),
-            BadRequest
-        );
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] GetCustomerByValueQuery model)
-    {
-        var result = await Mediator.Send(model);
-        return result.Match<IActionResult>(
-            success => Ok(success.Value),
-            _ => NotFound(),
-            BadRequest
-        );
-    }
-
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] InsertCustomerCommand model)
+    public async Task<IActionResult> Post([FromBody] InsertCustomerContactInfoCommand model)
     {
         var result = await Mediator.Send(model);
         return result.Match<IActionResult>(

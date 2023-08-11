@@ -27,13 +27,14 @@ export class EditCustomerPageComponent implements OnInit {
   }
 
   public async onUpdateCustomerInfoCallback(info: CustomerPerson | CustomerCompany): Promise<void> {
-    const url = this.isCompany ? `customercompany/${this.customer.id}` : `customerperson/${this.customer.id}`;
     const body = {
-      id: this.customer?.customerId,
+      id: this.customer?.id,
+      isActive: this.customer?.active,
       rowVersion: this.customer?.rowVersion,
+      isCompany: this.isCompany,
       ...info,
     };
-    const req = this.http.patch<SqlResult>(url, body);
+    const req = this.http.put<SqlResult>('customer', body);
     const res = await firstValueFrom(req);
     this.customer.rowVersion = res.rowVersion;
     this.notifications.addNotification(`Customer info updated successfully.`, 'Customer info updated');

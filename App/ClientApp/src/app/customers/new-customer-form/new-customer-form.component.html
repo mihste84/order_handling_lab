@@ -64,9 +64,8 @@
 
     <section *ngIf="currentSection === FormSection.AddressInfo" formArrayName="customerAddresses" class="mb-2">
       <ng-container *ngFor="let item of addresses?.controls; let i = index">
-        <hr class="my-3" />
-
         <div *ngIf="i > 0" class="text-right m-2">
+          <hr class="my-3" />
           <span (click)="onRemoveSecondaryAddress(i)" class="text-sm text-blue-500 whitespace-nowrap cursor-pointer">
             Remove address
           </span>

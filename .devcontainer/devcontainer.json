@@ -33,22 +33,23 @@
 
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
-		"ms-dotnettools.csharp",
-		"ms-mssql.mssql",
-		"ms-dotnettools.csharp",
-		"ms-mssql.data-workspace-vscode",
-		"GitHub.copilot",
-		"patcx.vscode-nuget-gallery",
-		"esbenp.prettier-vscode",
-		"bradlc.vscode-tailwindcss",
-		"chiadem.cs2ts-vscode-extension",
-		"josefpihrt-vscode.roslynator",
-		"formulahendry.dotnet-test-explorer",
-		"aliasadidev.nugetpackagemanagergui"
-	]
+        "ms-dotnettools.csharp",
+        "ms-mssql.mssql",
+        "ms-dotnettools.csharp",
+        "ms-mssql.data-workspace-vscode",
+        "GitHub.copilot",
+        "patcx.vscode-nuget-gallery",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "chiadem.cs2ts-vscode-extension",
+        "josefpihrt-vscode.roslynator",
+        "formulahendry.dotnet-test-explorer",
+        "aliasadidev.nugetpackagemanagergui",
+        "Angular.ng-template"
+      ]
     }
   },
-  "forwardPorts": [1433, 3000, 5299, 7206, 5173],
+  "forwardPorts": [1433, 3000, 5299, 7206, 5173, 4200, 7250],
   "portsAttributes": {
     "7206": {
       "protocol": "https"

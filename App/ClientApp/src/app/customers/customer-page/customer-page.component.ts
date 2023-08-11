@@ -6,12 +6,12 @@ import { DynamicSearchQuery } from '../../shared/models/dynamic-search-query';
 import { SearchResults, SqlResult } from '../../shared/models/types';
 import { firstValueFrom } from 'rxjs';
 import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { SortResult } from 'src/app/shared/components/table-header/table-header.component';
+import { SortResult } from '../../shared/components/table-header/table-header.component';
 import { NewCustomer } from '../new-customer-form/new-customer-form.component';
 import { AuthUserService } from '../../security/auth-user.service';
 import { NotificationService } from '../../shared/services/notification.service';
-import { ConfirmComponent } from 'src/app/shared/components/confirm/confirm.component';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
+import { ModalComponent } from '../../shared/components/modal/modal.component';
 
 export interface SearchCustomer {
   id: number;
@@ -36,7 +36,6 @@ export interface SearchCustomer {
 export class CustomerPageComponent implements OnInit, OnDestroy {
   public searchModel: DynamicSearchQuery = new DynamicSearchQuery({
     searchItems: [
-      { name: 'ID', distplayName: 'ID', type: SearchTypes.Text },
       { name: 'FirstName', distplayName: 'First name', type: SearchTypes.Text },
       { name: 'LastName', distplayName: 'Last name', type: SearchTypes.Text },
       { name: 'MiddleName', distplayName: 'Middle name', type: SearchTypes.Text },
