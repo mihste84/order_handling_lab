@@ -27,6 +27,6 @@
     <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\App\App.csproj" />
+    <ProjectReference Include="..\..\App\App.csproj" />
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Customers;
 using Common;
 
-namespace Tests;
+namespace UnitTests;
 
 public static class Startup
 {

@@ -3,7 +3,7 @@ using Customers.CommonModels;
 using Customers.BaseCustomers.Commands;
 using Customers.BaseCustomers.Queries;
 
-namespace Tests.Commands;
+namespace UnitTests.Commands;
 
 public class CustomersCommandTests
 {

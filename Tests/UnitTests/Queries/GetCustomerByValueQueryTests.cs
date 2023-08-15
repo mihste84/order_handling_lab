@@ -1,7 +1,7 @@
 using Customers.BaseCustomers.Queries;
 using Customers.Constants;
 
-namespace Tests.Queries;
+namespace UnitTests.Queries;
 
 public class GetCustomerByValueQueryTests
 {

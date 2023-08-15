@@ -170,7 +170,7 @@ public class CustomerRepository : ICustomerRepository
                 CustomerQueries.Insert, parameters, transaction: _transaction
             );
         }
-        catch (SqlException ex) when (ex.Message?.Contains("Cannot insert duplicate key") == true)
+        catch (SqlException ex) when (ex.Message?.Contains("Cannot insert duplicate key") == true || ex.Number == 2627)
         { //(ex.Number == 2627) {
             var message = IsCompany
                 ? "Cannot insert customer company. Code already exists."

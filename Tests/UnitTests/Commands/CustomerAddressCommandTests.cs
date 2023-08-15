@@ -1,7 +1,7 @@
 using Common.Services;
 using Customers.CustomerAddresses.Commands;
 
-namespace Tests.Commands;
+namespace UnitTests.Commands;
 
 public class CustomerAddressCommandTests
 {

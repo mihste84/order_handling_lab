@@ -4,6 +4,6 @@ global using Models.Entities;
 global using Xunit.Extensions.Ordering;
 global using Moq;
 global using Models.Constants;
-global using Tests.Services;
+global using UnitTests.Services;
 global using Common.Models;
 global using Models.Values;

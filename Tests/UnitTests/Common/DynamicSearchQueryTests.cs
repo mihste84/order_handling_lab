@@ -1,6 +1,6 @@
 using Models.Values;
 
-namespace Tests.Common;
+namespace UnitTests.Common;
 
 public class DynamicSearchQueryTests
 {

@@ -1,4 +1,4 @@
-namespace Tests.Services;
+namespace UnitTests.Services;
 
 public class TestAuthenticationService : IAuthenticationService
 {
