@@ -1,3 +1,5 @@
+using FluentValidation.Results;
+
 namespace Customers.CustomerAddresses.Commands;
 
 public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf<Success<SqlResult>, Error<string>, ValidationError>>
@@ -34,6 +36,10 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
             var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
+
+            var addressCount = await _unitOfWork.CustomerAddressRepository.GetCountByCustomerIdAsync(request.CustomerId.GetValueOrDefault());
+            if (addressCount == 3)
+                return new ValidationError(new[] { new ValidationFailure("Address count", "Customer cannot have more than 3 different addresses.") });
 
             var username = _authenticationService.GetUserName();
 

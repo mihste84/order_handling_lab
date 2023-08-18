@@ -13,6 +13,8 @@ import { RouterModule } from '@angular/router';
 import { CustomerInfoFormComponent } from './customer-info-form/customer-info-form.component';
 import { ContactInfoListComponent } from './contact-info-list/contact-info-list.component';
 import { ContactInfoFormComponent } from './contact-info-form/contact-info-form.component';
+import { AddressListComponent } from './address-list/address-list.component';
+import { AddressFormComponent } from './address-form/address-form.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import { ContactInfoFormComponent } from './contact-info-form/contact-info-form.
     CustomerInfoFormComponent,
     ContactInfoListComponent,
     ContactInfoFormComponent,
+    AddressListComponent,
+    AddressFormComponent,
   ],
   imports: [
     CommonModule,

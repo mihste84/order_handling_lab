@@ -66,7 +66,7 @@ public class CustomerAddressCommandTests
     }
 
     [Fact]
-    public async Task InsertCustomerAddressCommand_Invalid()
+    public async Task InsertCustomerAddressCommand_Validation_Error()
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 
@@ -88,6 +88,42 @@ public class CustomerAddressCommandTests
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerAddressRepository.InsertAsync(It.IsAny<CustomerAddress>()), Times.Never);
         mockUnitOfWork.Verify(x => x.CustomerAddressRepository.RemoveAllPrimaryAsync(It.IsAny<int?>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task InsertCustomerAddressCommand_Address_Count_Validation_Error()
+    {
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
+        mockUnitOfWork
+            .Setup(x => x.CustomerAddressRepository.GetCountByCustomerIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(3);
+        var command = new InsertCustomerAddressCommand
+        {
+            Address = "Test Address",
+            CityId = 1,
+            CountryId = 1,
+            IsPrimary = true,
+            PostArea = "Stockholm",
+            RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+            CustomerId = 1,
+            ZipCode = "1234"
+        };
+        var handler = new InsertCustomerAddressCommand.InsertCustomerAddressHandler(
+            mockUnitOfWork.Object,
+            new TestAuthenticationService(),
+            new InsertCustomerAddressCommand.InsertCustomerAddressValidator()
+        );
+
+        var result = await handler.Handle(command, CancellationToken.None);
+        Assert.True(result.IsT2);
+        var errors = result.AsT2.Errors;
+        Assert.Single(errors);
+        Assert.Contains("Address count", errors.Select(x => x.PropertyName));
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Once);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetCountByCustomerIdAsync(It.IsAny<int>()), Times.Once());
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
@@ -287,7 +323,9 @@ public class CustomerAddressCommandTests
     public async Task DeleteCustomerAddressCommand()
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
-
+        mockUnitOfWork
+            .Setup(x => x.CustomerAddressRepository.GetCountByCustomerIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(2);
         var command = new DeleteCustomerAddressCommand
         {
             Id = 1
@@ -305,10 +343,12 @@ public class CustomerAddressCommandTests
     }
 
     [Fact]
-    public async Task DeleteCustomerAddressCommand_Invalid()
+    public async Task DeleteCustomerAddressCommand_Validation_Error()
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
-
+        mockUnitOfWork
+            .Setup(x => x.CustomerAddressRepository.GetCountByCustomerIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(2);
         var command = new DeleteCustomerAddressCommand();
         var handler = new DeleteCustomerAddressCommand.DeleteCustomerAddressHandler(
             mockUnitOfWork.Object,
@@ -325,10 +365,38 @@ public class CustomerAddressCommandTests
     }
 
     [Fact]
+    public async Task DeleteCustomerAddressCommand_Address_Count_Validation_Error()
+    {
+        var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
+
+        var command = new DeleteCustomerAddressCommand
+        {
+            Id = 1
+        };
+        var handler = new DeleteCustomerAddressCommand.DeleteCustomerAddressHandler(
+            mockUnitOfWork.Object,
+            new DeleteCustomerAddressCommand.DeleteCustomerAddressValidator()
+        );
+
+        var result = await handler.Handle(command, CancellationToken.None);
+        Assert.True(result.IsT2);
+        var errors = result.AsT2.Errors;
+        Assert.Single(errors);
+        Assert.Contains("Address count", errors.Select(x => x.PropertyName));
+        mockUnitOfWork.VerifyGet(x => x.CustomerAddressRepository, Times.Exactly(2));
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetCountByCustomerIdAsync(It.IsAny<int>()), Times.Once());
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.GetByIdAsync(It.IsAny<int>()), Times.Once());
+        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.CustomerAddressRepository.DeleteByIdAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
     public async Task DeleteCustomerAddressCommand_Error()
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues() { Delete = false });
-
+        mockUnitOfWork
+            .Setup(x => x.CustomerAddressRepository.GetCountByCustomerIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(2);
         var command = new DeleteCustomerAddressCommand
         {
             Id = 2
@@ -383,6 +451,9 @@ public class CustomerAddressCommandTests
                 PostArea = "Test Post Area",
                 RowVersion = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
             });
+        mockCustomerAddressRepository
+            .Setup(x => x.GetCountByCustomerIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(1);
 
         mockUnitOfWork.SetupGet(x => x.CustomerAddressRepository).Returns(mockCustomerAddressRepository.Object);
 

@@ -17,6 +17,16 @@ public class CustomerAddressRepository : ICustomerAddressRepository
         CustomerAddressQueries.GetById, new { Id = id }, _transaction
     );
 
+    public async Task<int?> GetCountByCustomerIdAsync(int id)
+    => await _transaction.Connection.QueryFirstOrDefaultAsync<int>(
+        CustomerAddressQueries.GetCountByCustomerId, new { CustomerId = id }, _transaction
+    );
+
+    public async Task<IEnumerable<CustomerAddress>?> GetByCustomerIdAsync(int id)
+    => await _transaction.Connection.QueryAsync<CustomerAddress>(
+        CustomerAddressQueries.GetByCustomerId, new { CustomerId = id }, _transaction
+    );
+
     public async Task<SqlResult?> InsertAsync(CustomerAddress entity)
     => await _transaction.Connection.QuerySingleAsync<SqlResult>(CustomerAddressQueries.Insert, entity, _transaction);
 
@@ -24,10 +34,10 @@ public class CustomerAddressRepository : ICustomerAddressRepository
     => await _transaction.Connection.ExecuteAsync(CustomerAddressQueries.InsertMultiple, addresses, _transaction) > 0;
 
     public async Task<SqlResult> UpdateAsync(CustomerAddress entity)
-    => await _transaction.Connection.ExecuteScalarAsync<SqlResult>(CustomerAddressQueries.Update, entity, _transaction);
+    => await _transaction.Connection.QuerySingleAsync<SqlResult>(CustomerAddressQueries.Update, entity, _transaction);
 
     public async Task RemoveAllPrimaryAsync(int? customerId)
-    => await _transaction.Connection.QuerySingleAsync(
+    => await _transaction.Connection.ExecuteAsync(
         CustomerAddressQueries.RemoveAllPrimary, new { CustomerId = customerId }, _transaction
     );
 

@@ -1,3 +1,5 @@
+using FluentValidation.Results;
+
 namespace Customers.CustomerAddresses.Commands;
 
 public class DeleteCustomerAddressCommand : IRequest<OneOf<Success, Error<string>, ValidationError>>
@@ -30,6 +32,14 @@ public class DeleteCustomerAddressCommand : IRequest<OneOf<Success, Error<string
             var result = await _validator.ValidateAsync(request, cancellationToken);
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
+
+            var addressToDelete = await _unitOfWork.CustomerAddressRepository.GetByIdAsync(request.Id!.Value);
+            if (addressToDelete == null)
+                return new Error<string>("Customer address not found.");
+
+            var addressCount = await _unitOfWork.CustomerAddressRepository.GetCountByCustomerIdAsync(addressToDelete.CustomerId.GetValueOrDefault());
+            if (addressCount == 1)
+                return new ValidationError(new[] { new ValidationFailure("Address count", "Cannot delete the last address.") });
 
             var success = await _unitOfWork.CustomerAddressRepository.DeleteByIdAsync(request.Id!.Value);
             if (!success)

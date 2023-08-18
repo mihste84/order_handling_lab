@@ -2,7 +2,7 @@ using Customers.BaseCustomers.Commands;
 using Customers.CustomerContactInfos.Commands;
 
 namespace App.Controllers;
-public class ContactInfoController : BaseController
+public class CustomerContactInfoController : BaseController
 {
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] InsertCustomerContactInfoCommand model)
@@ -16,7 +16,7 @@ public class ContactInfoController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Patch([FromBody] UpdateCustomerContactInfoCommand model)
+    public async Task<IActionResult> Put([FromBody] UpdateCustomerContactInfoCommand model)
     {
         var result = await Mediator.Send(model);
         return result.Match(

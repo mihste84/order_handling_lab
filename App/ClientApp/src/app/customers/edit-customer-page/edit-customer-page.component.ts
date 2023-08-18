@@ -61,7 +61,7 @@ export class EditCustomerPageComponent implements OnInit {
     const ref = this.sharedModal.showModalWithComponent(ContactInfoFormComponent, undefined, 'Add contact info');
     ref?.instance.onFormSubmit.subscribe(async (model: ContactInfoModel) => {
       model.customerId = this.customer.id;
-      const postUser$ = this.http.post<SqlResult>('ContactInfo', model);
+      const postUser$ = this.http.post<SqlResult>('CustomerContactInfo', model);
       const res = await firstValueFrom(postUser$);
       if (!this.customer.customerContactInfos) this.customer.customerContactInfos = [];
       this.customer.customerContactInfos.push(this.getContactInfoFromModel(model, res));
@@ -85,7 +85,7 @@ export class EditCustomerPageComponent implements OnInit {
     );
 
     ref?.instance.onConfirm.subscribe(async (c: ContactInfo) => {
-      const deleteUser$ = this.http.delete('ContactInfo/' + c.id);
+      const deleteUser$ = this.http.delete('CustomerContactInfo/' + c.id);
       await firstValueFrom(deleteUser$);
       this.customer.customerContactInfos = this.customer.customerContactInfos.filter((_) => _.id !== c.id);
       this.notifications.addNotification(
@@ -113,7 +113,7 @@ export class EditCustomerPageComponent implements OnInit {
       'Edit contact info'
     );
     ref?.instance.onFormSubmit.subscribe(async (model: ContactInfoModel) => {
-      const putUser$ = this.http.put<SqlResult>('ContactInfo', model);
+      const putUser$ = this.http.put<SqlResult>('CustomerContactInfo', model);
       const res = await firstValueFrom(putUser$);
       this.customer.customerContactInfos = this.customer.customerContactInfos.map((_) =>
         _.id !== info.id ? _ : this.getContactInfoFromModel(model, res)

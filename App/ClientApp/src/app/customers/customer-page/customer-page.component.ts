@@ -164,6 +164,7 @@ export class CustomerPageComponent implements OnInit, OnDestroy {
       totalCustomers: this.totalCustomers,
     };
   }
+
   ngOnInit(): void {
     if (!this.cache.customerPage) return;
     this.searchModel = this.cache.customerPage.searchModel;

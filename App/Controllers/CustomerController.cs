@@ -38,7 +38,7 @@ public class CustomerController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Patch([FromBody] UpdateCustomerCommand model)
+    public async Task<IActionResult> Put([FromBody] UpdateCustomerCommand model)
     {
         var result = await Mediator.Send(model);
         return result.Match(
