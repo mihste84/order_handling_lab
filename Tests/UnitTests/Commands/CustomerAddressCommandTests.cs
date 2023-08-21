@@ -225,7 +225,7 @@ public class CustomerAddressCommandTests
     }
 
     [Fact]
-    public async Task UpdateCustomerAddressCommand_Invalid()
+    public async Task UpdateCustomerAddressCommand_Validation_Error()
     {
         var mockUnitOfWork = GetMockUnitOfWork(returnValues: new RepositoryReturnValues());
 

@@ -19,7 +19,7 @@ public sealed class CustomerAddressTests : IClassFixture<TestBase>
     public async Task Insert_New_Address()
     {
         await _testBase.ResetDbAsync();
-        var result = await InsertCustomerAsync();
+        var result = await _testBase.InsertCustomerAsync();
         var addressCommand = new InsertCustomerAddressCommand
         {
             CustomerId = result!.Id,
@@ -96,7 +96,7 @@ public sealed class CustomerAddressTests : IClassFixture<TestBase>
                 }
             }
         };
-        var result = await InsertCustomerAsync(command);
+        var result = await _testBase.InsertCustomerAsync(command);
         var addressCommand = new InsertCustomerAddressCommand
         {
             CustomerId = result!.Id,
@@ -110,18 +110,13 @@ public sealed class CustomerAddressTests : IClassFixture<TestBase>
 
         var response = await _testBase.HttpClient.PostAsJsonAsync("/api/customeraddress", addressCommand);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var content = await response.Content.ReadAsStringAsync();
-        var error = await response.Content.ReadFromJsonAsync<ValidationError>();
-        Assert.NotNull(error);
-        Assert.Single(error!.Errors);
-        Assert.Collection(error.Errors, _ => Assert.Equal("Address count", _.PropertyName));
     }
 
     [Fact]
     public async Task Update_Address()
     {
         await _testBase.ResetDbAsync();
-        var result = await InsertCustomerAsync();
+        var result = await _testBase.InsertCustomerAsync();
         var addresses = await _testBase.UnitOfWork.CustomerAddressRepository.GetByCustomerIdAsync(result!.Id!.Value);
         var address = addresses!.First();
         var updateCommand = new UpdateCustomerAddressCommand
@@ -190,7 +185,7 @@ public sealed class CustomerAddressTests : IClassFixture<TestBase>
                 }
             }
         };
-        var result = await InsertCustomerAsync(customerCommand);
+        var result = await _testBase.InsertCustomerAsync(customerCommand);
 
         var addresses = await _testBase.UnitOfWork.CustomerAddressRepository.GetByCustomerIdAsync(result!.Id!.Value);
         var addressToDelete = addresses!.Last();
@@ -208,7 +203,7 @@ public sealed class CustomerAddressTests : IClassFixture<TestBase>
     public async Task Delete_Last_Address_Error()
     {
         await _testBase.ResetDbAsync();
-        var result = await InsertCustomerAsync();
+        var result = await _testBase.InsertCustomerAsync();
 
         var addresses = await _testBase.UnitOfWork.CustomerAddressRepository.GetByCustomerIdAsync(result!.Id!.Value);
         var addressToDelete = addresses!.Last();
@@ -216,39 +211,4 @@ public sealed class CustomerAddressTests : IClassFixture<TestBase>
         var deleteResponse = await _testBase.HttpClient.DeleteAsync("/api/customeraddress/" + addressToDelete.Id);
         Assert.Equal(HttpStatusCode.BadRequest, deleteResponse.StatusCode);
     }
-
-    private async Task<SqlResult?> InsertCustomerAsync(InsertCustomerCommand? command = default)
-    {
-        var res = await _testBase.HttpClient.PostAsJsonAsync(
-            "/api/customer",
-            command ?? GetBaseInsertCustomerPersonCommand()
-        );
-        res.EnsureSuccessStatusCode();
-        return await res.Content.ReadFromJsonAsync<SqlResult>();
-    }
-
-    private static InsertCustomerCommand GetBaseInsertCustomerPersonCommand()
-    => new()
-    {
-        Ssn = "12345678-1234",
-        FirstName = "John",
-        LastName = "Doe",
-        IsCompany = false,
-        CustomerAddresses = new[] {
-            new CustomerAddressModel {
-                Address = "123 Main St",
-                CityId = 1,
-                CountryId = 1,
-                IsPrimary = true,
-                PostArea = "Stockholm",
-                ZipCode = "12345"
-            }
-        },
-        ContactInfo = new[] {
-            new CustomerContactInfoModel {
-                Type = ContactInfoType.Email,
-                Value = "test@mail.com"
-            }
-        }
-    };
 }

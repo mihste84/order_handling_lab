@@ -38,7 +38,7 @@ public class InsertCustomerAddressCommand : CustomerAddressModel, IRequest<OneOf
                 return new ValidationError(result.Errors);
 
             var addressCount = await _unitOfWork.CustomerAddressRepository.GetCountByCustomerIdAsync(request.CustomerId.GetValueOrDefault());
-            if (addressCount == 3)
+            if (addressCount >= 3)
                 return new ValidationError(new[] { new ValidationFailure("Address count", "Customer cannot have more than 3 different addresses.") });
 
             var username = _authenticationService.GetUserName();

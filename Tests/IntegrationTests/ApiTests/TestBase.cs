@@ -1,3 +1,5 @@
+using Customers.BaseCustomers.Commands;
+using Customers.CommonModels;
 using DatabaseDapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +34,65 @@ public class TestBase : IDisposable
             "Countries"
         }
     });
+
+    public async Task<SqlResult?> InsertCustomerAsync(InsertCustomerCommand? command = default)
+    {
+        var res = await HttpClient.PostAsJsonAsync(
+            "/api/customer",
+            command ?? GetBaseInsertCustomerPersonCommand()
+        );
+        res.EnsureSuccessStatusCode();
+        return await res.Content.ReadFromJsonAsync<SqlResult>();
+    }
+
+    public static InsertCustomerCommand GetBaseInsertCustomerCompanyCommand()
+    => new()
+    {
+        Name = "John",
+        Code = "123456789",
+        IsCompany = true,
+        CustomerAddresses = new[] {
+            new CustomerAddressModel {
+                Address = "123 Main St",
+                CityId = 1,
+                CountryId = 1,
+                IsPrimary = true,
+                PostArea = "Stockholm",
+                ZipCode = "12345"
+            }
+        },
+        ContactInfo = new[] {
+            new CustomerContactInfoModel {
+                Type = ContactInfoType.Email,
+                Value = "test@mail.com"
+            }
+        }
+    };
+
+    public static InsertCustomerCommand GetBaseInsertCustomerPersonCommand()
+    => new()
+    {
+        Ssn = "12345678-1234",
+        FirstName = "John",
+        LastName = "Doe",
+        IsCompany = false,
+        CustomerAddresses = new[] {
+            new CustomerAddressModel {
+                Address = "123 Main St",
+                CityId = 1,
+                CountryId = 1,
+                IsPrimary = true,
+                PostArea = "Stockholm",
+                ZipCode = "12345"
+            }
+        },
+        ContactInfo = new[] {
+            new CustomerContactInfoModel {
+                Type = ContactInfoType.Email,
+                Value = "test@mail.com"
+            }
+        }
+    };
 
     public async Task ResetDbAsync()
     {

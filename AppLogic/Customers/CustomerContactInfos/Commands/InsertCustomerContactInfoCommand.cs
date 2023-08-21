@@ -35,6 +35,10 @@ public class InsertCustomerContactInfoCommand : CustomerContactInfoModel, IReque
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
 
+            var infoCount = await _unitOfWork.CustomerContactInfoRepository.GetCountByCustomerIdAsync(request.CustomerId!.Value);
+            if (infoCount >= 5)
+                return new ValidationError(new[] { new ValidationFailure("Contact info count", "Customer cannot have more than 5 contact info.") });
+
             var username = _authenticationService.GetUserName();
 
             var info = MapModelToCustomerContactInfo(request, username);

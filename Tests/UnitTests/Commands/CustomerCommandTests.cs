@@ -97,7 +97,7 @@ public class CustomersCommandTests
     }
 
     [Fact]
-    public async Task InsertCustomerCommand_Invalid_Customer_Person()
+    public async Task InsertCustomerCommand_Validation_Error_Customer_Person()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
 
@@ -125,7 +125,7 @@ public class CustomersCommandTests
     }
 
     [Fact]
-    public async Task InsertCustomerCommand_Invalid_Customer_Company()
+    public async Task InsertCustomerCommand_Validation_Error_Customer_Company()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
 
@@ -335,7 +335,7 @@ public class CustomersCommandTests
     }
 
     [Fact]
-    public async Task UpdateCustomerCommand_Invalid_Person()
+    public async Task UpdateCustomerCommand_Validation_Error_Person()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
         var command = new UpdateCustomerCommand
@@ -366,7 +366,7 @@ public class CustomersCommandTests
     }
 
     [Fact]
-    public async Task UpdateCustomerCommand_Invalid_Company()
+    public async Task UpdateCustomerCommand_Validation_Error_Company()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
         var command = new UpdateCustomerCommand
@@ -447,7 +447,7 @@ public class CustomersCommandTests
     }
 
     [Fact]
-    public async Task DeleteCustomerCommand_Invalid()
+    public async Task DeleteCustomerCommand_Validation_Error()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
         var command = new DeleteCustomerCommand();
@@ -566,7 +566,7 @@ public class CustomersCommandTests
     }
 
     [Fact]
-    public async Task SearchCustomerQuery_Invalid_SearchItem_Name()
+    public async Task SearchCustomerQuery_Validation_Error_SearchItem_Name()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
         var query = new SearchCustomersQuery
@@ -596,7 +596,7 @@ public class CustomersCommandTests
     }
 
     [Fact]
-    public async Task SearchCustomerQuery_Invalid_SearchItem_Value_Empty()
+    public async Task SearchCustomerQuery_Validation_Error_SearchItem_Value_Empty()
     {
         var mockUnitOfWork = GetMockUnitOfWork(new RepositoryReturnValues());
 

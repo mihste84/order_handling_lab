@@ -31,6 +31,14 @@ public class DeleteCustomerContactInfoCommand : IRequest<OneOf<Success, Error<st
             if (!result.IsValid)
                 return new ValidationError(result.Errors);
 
+            var infoToDelete = await _unitOfWork.CustomerContactInfoRepository.GetByIdAsync(request.Id!.Value);
+            if (infoToDelete == null)
+                return new Error<string>("Contact info not found.");
+
+            var infoCount = await _unitOfWork.CustomerContactInfoRepository.GetCountByCustomerIdAsync(infoToDelete.CustomerId.GetValueOrDefault());
+            if (infoCount == 1)
+                return new ValidationError(new[] { new ValidationFailure("Contact info count", "Cannot delete the last contact info.") });
+
             var success = await _unitOfWork.CustomerContactInfoRepository.DeleteByIdAsync(request.Id!.Value);
             if (!success)
                 return new Error<string>("Failed to delete customer contact info.");

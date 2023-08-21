@@ -17,6 +17,16 @@ public class CustomerContactInfoRepository : ICustomerContactInfoRepository
         CustomerContactInfoQueries.GetById, new { Id = id }, _transaction
     );
 
+    public async Task<IEnumerable<CustomerContactInfo>?> GetByCustomerIdAsync(int id)
+    => await _transaction.Connection.QueryAsync<CustomerContactInfo>(
+        CustomerContactInfoQueries.GetByCustomerId, new { CustomerId = id }, _transaction
+    );
+
+    public async Task<int?> GetCountByCustomerIdAsync(int id)
+    => await _transaction.Connection.QueryFirstOrDefaultAsync<int>(
+        CustomerContactInfoQueries.GetCountByCustomerId, new { CustomerId = id }, _transaction
+    );
+
     public async Task<SqlResult?> InsertAsync(CustomerContactInfo entity)
     => await _transaction.Connection.QuerySingleAsync<SqlResult>(
         CustomerContactInfoQueries.Insert, entity, _transaction

@@ -23,7 +23,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Insert_Customer_Person()
     {
         await _testBase.ResetDbAsync();
-        var command = GetBaseInsertCustomerPersonCommand();
+        var command = TestBase.GetBaseInsertCustomerPersonCommand();
 
         var response = await InsertCustomerAsync(command);
 
@@ -56,7 +56,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Insert_Customer_Company()
     {
         await _testBase.ResetDbAsync();
-        var command = GetBaseInsertCustomerCompanyCommand();
+        var command = TestBase.GetBaseInsertCustomerCompanyCommand();
         var response = await InsertCustomerAsync(command);
 
         Assert.NotNull(response);
@@ -102,7 +102,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Update_Customer_Person()
     {
         await _testBase.ResetDbAsync();
-        var insertCommand = GetBaseInsertCustomerPersonCommand();
+        var insertCommand = TestBase.GetBaseInsertCustomerPersonCommand();
 
         var insertResponse = await InsertCustomerAsync(insertCommand);
 
@@ -137,7 +137,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Update_Customer_Company()
     {
         await _testBase.ResetDbAsync();
-        var insertCommand = GetBaseInsertCustomerCompanyCommand();
+        var insertCommand = TestBase.GetBaseInsertCustomerCompanyCommand();
 
         var insertResponse = await InsertCustomerAsync(insertCommand);
 
@@ -169,7 +169,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Delete_Customer_Person()
     {
         await _testBase.ResetDbAsync();
-        var insertCommand = GetBaseInsertCustomerPersonCommand();
+        var insertCommand = TestBase.GetBaseInsertCustomerPersonCommand();
 
         var insertResponse = await InsertCustomerAsync(insertCommand);
 
@@ -183,7 +183,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Delete_Customer_Company()
     {
         await _testBase.ResetDbAsync();
-        var insertCommand = GetBaseInsertCustomerCompanyCommand();
+        var insertCommand = TestBase.GetBaseInsertCustomerCompanyCommand();
 
         var insertResponse = await InsertCustomerAsync(insertCommand);
 
@@ -197,7 +197,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Get_Customer_By_Ssn()
     {
         await _testBase.ResetDbAsync();
-        var insertCommand = GetBaseInsertCustomerPersonCommand();
+        var insertCommand = TestBase.GetBaseInsertCustomerPersonCommand();
         var response = await InsertCustomerAsync(insertCommand);
 
         var res = await _testBase.HttpClient.GetFromJsonAsync<CustomerDto>($"/api/customer?value={response!.Id}&type={CustomerSearchValues.Id}");
@@ -216,7 +216,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Get_Customer_By_Code()
     {
         await _testBase.ResetDbAsync();
-        var insertCommand = GetBaseInsertCustomerCompanyCommand();
+        var insertCommand = TestBase.GetBaseInsertCustomerCompanyCommand();
         var response = await InsertCustomerAsync(insertCommand);
 
         var res = await _testBase.HttpClient.GetFromJsonAsync<CustomerDto>($"/api/customer?value={response!.Id}&type={CustomerSearchValues.Id}");
@@ -233,7 +233,7 @@ public sealed class CustomerTests : IClassFixture<TestBase>
     public async Task Get_Customer_By_Id()
     {
         await _testBase.ResetDbAsync();
-        var insertCommand = GetBaseInsertCustomerPersonCommand();
+        var insertCommand = TestBase.GetBaseInsertCustomerPersonCommand();
         var response = await InsertCustomerAsync(insertCommand);
 
         var res = await _testBase.HttpClient.GetFromJsonAsync<CustomerDto>($"/api/customer?value={response!.Id}&type={CustomerSearchValues.Id}");
@@ -593,55 +593,6 @@ public sealed class CustomerTests : IClassFixture<TestBase>
             await InsertCustomerAsync(customer);
         }
     }
-
-    private static InsertCustomerCommand GetBaseInsertCustomerCompanyCommand()
-    => new()
-    {
-        Name = "John",
-        Code = "123456789",
-        IsCompany = true,
-        CustomerAddresses = new[] {
-            new CustomerAddressModel {
-                Address = "123 Main St",
-                CityId = 1,
-                CountryId = 1,
-                IsPrimary = true,
-                PostArea = "Stockholm",
-                ZipCode = "12345"
-            }
-        },
-        ContactInfo = new[] {
-            new CustomerContactInfoModel {
-                Type = ContactInfoType.Email,
-                Value = "test@mail.com"
-            }
-        }
-    };
-
-    private static InsertCustomerCommand GetBaseInsertCustomerPersonCommand()
-    => new()
-    {
-        Ssn = "12345678-1234",
-        FirstName = "John",
-        LastName = "Doe",
-        IsCompany = false,
-        CustomerAddresses = new[] {
-            new CustomerAddressModel {
-                Address = "123 Main St",
-                CityId = 1,
-                CountryId = 1,
-                IsPrimary = true,
-                PostArea = "Stockholm",
-                ZipCode = "12345"
-            }
-        },
-        ContactInfo = new[] {
-            new CustomerContactInfoModel {
-                Type = ContactInfoType.Email,
-                Value = "test@mail.com"
-            }
-        }
-    };
 
     private static string GetQueryStringFromObject(string basePath, SearchCustomersQuery model)
     {

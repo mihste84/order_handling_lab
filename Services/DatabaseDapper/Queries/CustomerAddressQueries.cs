@@ -5,6 +5,7 @@ public static class CustomerAddressQueries
     public const string GetById = "SELECT * FROM CustomerAddresses WHERE Id = @Id";
 
     public const string GetCountByCustomerId = "SELECT COUNT(*) FROM CustomerAddresses WHERE CustomerId = @CustomerId";
+
     public const string GetByCustomerId = "SELECT * FROM CustomerAddresses WHERE CustomerId = @CustomerId";
 
     public const string GetAllReferenceDataAsync = "SELECT * FROM Cities; SELECT * FROM Countries;";

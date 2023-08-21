@@ -10,3 +10,4 @@ global using OneOf.Types;
 global using Common.Models;
 global using Models.Values;
 global using Customers.Constants;
+global using FluentValidation.Results;
