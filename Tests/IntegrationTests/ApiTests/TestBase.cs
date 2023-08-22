@@ -8,7 +8,7 @@ using Respawn;
 using Respawn.Graph;
 
 namespace IntegrationTests.ApiTests;
-
+// Shared context for all tests in a class
 public class TestBase : IDisposable
 {
     public readonly HttpClient HttpClient;

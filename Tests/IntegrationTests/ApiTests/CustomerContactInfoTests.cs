@@ -1,12 +1,10 @@
-using System.Net;
 using Customers.BaseCustomers.Commands;
 using Customers.CommonModels;
-using Customers.CustomerAddresses.Commands;
 using Customers.CustomerContactInfos.Commands;
 
 namespace IntegrationTests.ApiTests;
 
-[Order(4)]
+[Order(2)]
 public sealed class CustomerContactInfoTests : IClassFixture<TestBase>
 {
     private readonly TestBase _testBase;

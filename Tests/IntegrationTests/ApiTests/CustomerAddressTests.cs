@@ -5,7 +5,7 @@ using Customers.CustomerAddresses.Commands;
 
 namespace IntegrationTests.ApiTests;
 
-[Order(3)]
+[Order(1)]
 public sealed class CustomerAddressTests : IClassFixture<TestBase>
 {
     private readonly TestBase _testBase;

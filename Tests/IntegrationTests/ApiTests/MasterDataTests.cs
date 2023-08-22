@@ -1,6 +1,6 @@
 namespace IntegrationTests.ApiTests;
 
-[Order(1)]
+[Order(5)]
 public sealed class MasterDataTests : IClassFixture<TestBase>
 {
     private readonly TestBase _testBase;
